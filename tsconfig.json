@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "target": "esnext",
+      "module": "esnext",
+      "strict": false,
+      "moduleResolution": "node"
+    },
+    "include": [
+      "index.ts"
+    ],
+    "exclude": [
+      "node_modules/**/*"
+    ]
+  }
+  

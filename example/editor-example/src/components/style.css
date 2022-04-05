@@ -1,0 +1,74 @@
+:root {
+  --medium-editor-link-color: #4fc08d;
+}
+
+
+.medium-editor {
+    font-size: 1em;
+}
+
+/* 移除激活时的外边框 */
+.medium-editor-element {
+  outline: none;
+}
+
+/* 段落 */
+.medium-editor p {
+  font-size: 1em;
+}
+
+/* Head 标题*/
+.medium-editor h1 {
+  font-size: 2em;
+}
+
+.medium-editor h2 {
+  font-size: 1.5em;
+}
+
+.medium-editor h3 {
+  font-size: 1.17em;
+}
+
+.medium-editor h4 {
+  font-size: 1em;
+}
+
+.medium-editor h5 {
+  font-size: .83em;
+}
+
+.medium-editor h6 {
+  font-size: .67em;
+}
+
+/* Blockquote 引用 */
+.medium-editor blockquote {
+  border-left: 4px solid black;
+  padding-left: 5px;
+  margin-left: 0em;
+}
+
+/* 换行多个引用时会用到 */
+/* .medium-editor blockquote +  blockquote {
+  margin-top: -21px;
+  padding-top: 27px;
+} */
+
+/* Link 链接 */
+.medium-editor a {
+  color: var(--medium-editor-link-color);
+  cursor: pointer;
+}
+
+.medium-editor li p {
+    /* clear p in li */
+  margin: 0;
+  padding: 0;
+}
+
+.medium-editor ol p {
+  /* clear p in li */
+  margin: 0;
+  padding: 0;
+}

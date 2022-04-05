@@ -1,0 +1,35 @@
+{
+  "name": "vue3-medium-editor",
+  "version": "0.0.1",
+  "description": "A medium editor for vue 3.x",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "compile": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/zgljl2012/vue3-medium-editor.git"
+  },
+  "keywords": [
+    "vue3",
+    "medium-editor"
+  ],
+  "author": "liaojl@cpchain.io",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zgljl2012/vue3-medium-editor/issues"
+  },
+  "homepage": "https://github.com/zgljl2012/vue3-medium-editor#readme",
+  "engines": {
+    "node": ">=16.13.0",
+    "npm": ">=6.14.2"
+  },
+  "dependencies": {
+    "@babel/types": "^7.17.0",
+    "@types/medium-editor": "^5.0.5",
+    "medium-editor": "^5.23.3",
+    "vue": "^3.0.0-rc.1"
+  }
+}
