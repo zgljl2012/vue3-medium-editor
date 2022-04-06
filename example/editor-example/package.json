@@ -12,6 +12,7 @@
     "@types/medium-editor": "^5.0.5",
     "core-js": "^3.8.3",
     "medium-editor": "^5.23.3",
+    "medium-editor-x": "0.0.2",
     "vue": "^3.2.13",
     "vue3-medium-editor": "../.."
   },

@@ -1,5 +1,5 @@
 import { h, defineComponent } from 'vue'
-import MediumEditor from 'medium-editor'
+import MediumEditor from 'medium-editor-x'
 import 'medium-editor/dist/css/medium-editor.min.css'
 import 'medium-editor/dist/css/themes/default.min.css'
 import '@fortawesome/fontawesome-free/css/all.min.css'

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="margin-left: 3em; margin-right: 3em;">
     <hr/>
     <editor1 text="" @edit='edit' />
   </div>

@@ -154,9 +154,6 @@ export default class Core {
     // In that case, align buttons with the editor
     position.left = position.left < 0 ? elPosition.left : position.left
 
-    // TODO 准确计算 left，目前设为固定值
-    position.left = 5
-
     this.buttons.style.left = `${position.left}px`
     this.buttons.style.top = `${position.top}px`
   }
@@ -187,7 +184,7 @@ export default class Core {
     let belongsToEditor = false
 
     // Don't show buttons when the element has text
-    if (el.innerText.trim() !== '') {
+    if (!el || !el.innerText || el.innerText.trim() !== '') {
       return false
     }
 
