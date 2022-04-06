@@ -1,10 +1,12 @@
 :root {
   --medium-editor-link-color: #4fc08d;
+  --medium-editor-p-line-height: 1.5em;
 }
 
 
 .medium-editor {
     font-size: 1em;
+    margin-left: 2em;
 }
 
 /* 移除激活时的外边框 */
@@ -15,6 +17,7 @@
 /* 段落 */
 .medium-editor p {
   font-size: 1em;
+  line-height: var(--medium-editor-p-line-height);
 }
 
 /* Head 标题*/

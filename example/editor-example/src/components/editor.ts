@@ -2,7 +2,10 @@ import { h, defineComponent } from 'vue'
 import MediumEditor from 'medium-editor'
 import 'medium-editor/dist/css/medium-editor.min.css'
 import 'medium-editor/dist/css/themes/default.min.css'
+import '@fortawesome/fontawesome-free/css/all.min.css'
+import { createEditorInsert } from './medium-editor-insert-plugin'
 import './style.css'
+import './medium-editor-insert-plugin/style.css'
 
 export default defineComponent({
   name: 'medium-editor',
@@ -52,7 +55,12 @@ export default defineComponent({
     }
   },
   render () {
-    return h(this.customTag, { class: 'medium-editor', id: this.elementID, ref: this.elementID, style: 'text-align:left; font-size: 18px;' })
+    return h(this.customTag, {
+      class: 'medium-editor',
+      id: this.elementID,
+      ref: this.elementID,
+      style: 'text-align:left; font-size: 18px;'
+    })
   },
   mounted () {
     this.createAndSubscribe()
@@ -72,10 +80,26 @@ export default defineComponent({
       this.editor?.destroy()
     },
     createAndSubscribe () {
+      // plugins
+      const MediumEditorInsert = createEditorInsert(
+        MediumEditor,
+        {
+          onClick: this.onClickImage
+        }
+      )
+      const options = {
+        ...this.options,
+        extensions: {
+          insert: new MediumEditorInsert()
+        }
+      }
       this.getElement().innerHTML = this.text || ''
-      this.editor = new MediumEditor(`#${this.elementID}`, this.options)
+      this.editor = new MediumEditor(`#${this.elementID}`, options)
       this.editor.subscribe('editableInput', this.emit)
       this.$emit('editorCreated', this.editor)
+    },
+    onClickImage () {
+      console.log('click image')
     }
   },
   watch: {
