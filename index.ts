@@ -6,6 +6,15 @@ import './style.css'
 
 export default defineComponent({
   name: 'medium-editor',
+  /**
+   * Usage:
+   * <editor text="" @edit='edit' />
+   * //...
+   * edit (op: {content: string}) {
+   *   console.log(op.content)
+   * }
+   */
+  emits: ['edit', 'editorCreated'],
   props: {
     text: {
       type: [String]
@@ -56,7 +65,7 @@ export default defineComponent({
       return document.getElementById(this.elementID) || { innerHTML: '' }
     },
     emit (event: Event) {
-      this.$emit('edit', { event, editor: this.editor })
+      this.$emit('edit', { event, editor: this.editor, content: this.editor?.getContent() })
     },
     tearDown () {
       this.editor?.unsubscribe('editableInput', this.emit)
