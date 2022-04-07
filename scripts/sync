@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+target_dir='example/editor-example/node_modules/vue3-medium-editor'
+
+cp index.js $target_dir/index.js
+cp index.ts $target_dir/index.ts
+cp style.css $target_dir/index.css
+cp -r extensions/ $target_dir/extensions/

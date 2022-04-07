@@ -7,8 +7,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import editor1 from './editor'
-// import editor1 from 'vue3-medium-editor'
+// import editor1 from './editor'
+import editor1 from 'vue3-medium-editor'
 
 export default defineComponent({
   name: 'HelloWorld',

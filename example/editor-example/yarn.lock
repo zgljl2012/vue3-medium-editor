@@ -4524,15 +4524,10 @@ media-typer@0.3.0:
   resolved "https://registry.npmjs.org/media-typer/-/media-typer-0.3.0.tgz"
   integrity sha1-hxDXrwqmJvj/+hzgAWhUUmMlV0g=
 
-medium-editor-x@0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/medium-editor-x/-/medium-editor-x-0.0.2.tgz#d2c0b46078103aebab21cfc40926888069e48465"
-  integrity sha512-Jy9wM8GMik89H7s2yOvZhhStfJwNe/79+XbXooW1oxy7i45StfbAG3Zz+5PpQxSLXwsK5YSweLcZ7hjGiudLFg==
-
-medium-editor-x@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/medium-editor-x/-/medium-editor-x-0.0.1.tgz#1841433532730ab88670b1cbfb78b63595eef3b4"
-  integrity sha512-hCQohWTGbPItEzpLXdRfXbjEHz+XqRyCUuRG87BCNeprjsINpVvIumuuWFJmyEAjDyUNWogmjZODgwMiDyFFYQ==
+medium-editor-x@0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/medium-editor-x/-/medium-editor-x-0.0.3.tgz#31f8bef3b01c05fcacf96c0cc11de69f179bda2b"
+  integrity sha512-9UUS4BwaxlGnWgmPlXj7nAGgx1wSHTirKQYn2ZTT0SoleFf1DRTm6mz1jO/Pbiipbr5yHandau6JHsc1F5jLFg==
 
 medium-editor@^5.23.3:
   version "5.23.3"
@@ -6450,8 +6445,7 @@ vue3-medium-editor@../..:
   version "0.0.1"
   dependencies:
     "@babel/types" "^7.17.0"
-    "@types/medium-editor" "^5.0.5"
-    medium-editor-x "^0.0.1"
+    medium-editor-x "0.0.3"
     vue "^3.0.0-rc.1"
 
 vue@^3.0.0-rc.1, vue@^3.2.13:

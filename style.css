@@ -1,5 +1,6 @@
 :root {
   --medium-editor-link-color: #4fc08d;
+  --medium-editor-p-line-height: 1.5em;
 }
 
 
@@ -15,6 +16,7 @@
 /* 段落 */
 .medium-editor p {
   font-size: 1em;
+  line-height: var(--medium-editor-p-line-height);
 }
 
 /* Head 标题*/

@@ -20,11 +20,6 @@
     "@babel/helper-validator-identifier" "^7.16.7"
     to-fast-properties "^2.0.0"
 
-"@types/medium-editor@^5.0.5":
-  version "5.0.5"
-  resolved "https://registry.yarnpkg.com/@types/medium-editor/-/medium-editor-5.0.5.tgz#5a982bb7288505f26e0290561d47b15e592c0989"
-  integrity sha512-iufODxGqPu78eZxOolGtc790n00LIZOeTVvdhX4ka+owG+/bdUnqcI59fTuW/JJavkIpYqCAFj7WKnJxJhQS6w==
-
 "@vue/compiler-core@3.2.31":
   version "3.2.31"
   resolved "https://registry.yarnpkg.com/@vue/compiler-core/-/compiler-core-3.2.31.tgz#d38f06c2cf845742403b523ab4596a3fda152e89"
@@ -132,10 +127,10 @@ magic-string@^0.25.7:
   dependencies:
     sourcemap-codec "^1.4.8"
 
-medium-editor@^5.23.3:
-  version "5.23.3"
-  resolved "https://registry.yarnpkg.com/medium-editor/-/medium-editor-5.23.3.tgz#6fb638759ae2fc76c423feb056f346d9c518d3b7"
-  integrity sha512-he9/TdjX8f8MGdXGfCs8AllrYnqXJJvjNkDKmPg3aPW/uoIrlRqtkFthrwvmd+u4QyzEiadhCCM0EwTiRdUCJw==
+medium-editor-x@0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/medium-editor-x/-/medium-editor-x-0.0.3.tgz#31f8bef3b01c05fcacf96c0cc11de69f179bda2b"
+  integrity sha512-9UUS4BwaxlGnWgmPlXj7nAGgx1wSHTirKQYn2ZTT0SoleFf1DRTm6mz1jO/Pbiipbr5yHandau6JHsc1F5jLFg==
 
 nanoid@^3.3.1:
   version "3.3.2"
