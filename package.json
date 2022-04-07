@@ -6,7 +6,7 @@
   "types": "index.d.ts",
   "scripts": {
     "dev": "cd example/editor-example && yarn serve",
-    "sync": "scripts/sync",
+    "sync": "npm run compile && scripts/sync",
     "compile": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

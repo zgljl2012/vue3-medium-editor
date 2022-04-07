@@ -22,6 +22,12 @@ export default defineComponent({
         text: {
             type: [String]
         },
+        onClickImage: {
+            type: [Function],
+            default: () => {
+                return null;
+            }
+        },
         options: {
             // Options: https://github.com/yabwe/medium-editor/blob/master/OPTIONS.md
             type: [Object],
@@ -94,11 +100,6 @@ export default defineComponent({
             this.editor = new MediumEditor(`#${this.elementID}`, options);
             this.editor.subscribe('editableInput', this.emit);
             this.$emit('editorCreated', this.editor);
-        },
-        onClickImage(cb) {
-            console.log('click image');
-            // eslint-disable-next-line node/no-callback-literal
-            cb('https://www.google.com.hk/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png');
         }
     },
     watch: {
