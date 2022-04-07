@@ -20,7 +20,7 @@ export default defineComponent({
   },
   methods: {
     edit (op: {content: string}) {
-      console.log(op.content)
+      // console.log(op.content)
     }
   }
 })

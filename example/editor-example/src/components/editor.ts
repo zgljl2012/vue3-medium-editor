@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { h, defineComponent } from 'vue'
 import MediumEditor from 'medium-editor-x'
 import 'medium-editor/dist/css/medium-editor.min.css'
@@ -98,8 +99,10 @@ export default defineComponent({
       this.editor.subscribe('editableInput', this.emit)
       this.$emit('editorCreated', this.editor)
     },
-    onClickImage () {
+    onClickImage (cb: any) {
       console.log('click image')
+      // eslint-disable-next-line node/no-callback-literal
+      cb('https://www.google.com.hk/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png')
     }
   },
   watch: {

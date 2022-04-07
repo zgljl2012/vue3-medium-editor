@@ -1,4 +1,6 @@
+/* eslint-disable */
 import Core from './Core'
+
 
 export const createEditorInsert = (MediumEditor: any, imageOptions: any) => {
   const MediumEditorInsert = MediumEditor.Extension.extend({

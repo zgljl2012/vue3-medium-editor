@@ -1,3 +1,4 @@
+/* eslint-disable */
 import Images from './addons/Images'
 import Embeds from './addons/Embeds'
 
@@ -103,6 +104,7 @@ export default class Core {
     html = `<a class='medium-editor-insert-buttons-show' style="border-color: rgba(0,0,0,.68); padding-top: 2px;"><svg class="svgIcon-use" width="25" height="25"><path d="M20 12h-7V5h-1v7H5v1h7v7h1v-7h7" fill-rule="evenodd"></path></svg></a>
     <ul class='medium-editor-insert-buttons-addons'>`
 
+    // 遍历插件
     Object.keys(addons).forEach(name => {
       const addon = addons[name]
 

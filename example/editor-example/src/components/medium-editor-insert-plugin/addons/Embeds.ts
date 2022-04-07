@@ -1,3 +1,4 @@
+/* eslint-disable */
 export default class Embeds {
   MediumEditor: any
   _plugin: any

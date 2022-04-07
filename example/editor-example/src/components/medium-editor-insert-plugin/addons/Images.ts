@@ -1,3 +1,4 @@
+/* eslint-disable */
 export const getToolbarButton = (MediumEditor: any) => {
   const ToolbarButton = MediumEditor.extensions.button.extend({
     init: function () {
@@ -231,6 +232,7 @@ export default class Images {
 
     this._plugin = plugin
     this._editor = this._plugin.base
+    // 上层用于辨识此插件的标识
     this.elementClassName = 'medium-editor-insert-images'
     this.activeClassName = 'medium-editor-insert-image-active'
     this.label = this.options.label
@@ -296,6 +298,7 @@ export default class Images {
       })
       return
     }
+    // 否则创建一个 input 进行图片上传
     this._input = document.createElement('input')
     this._input.type = 'file'
     this._input.multiple = true
@@ -414,8 +417,6 @@ export default class Images {
     if (!el) {
       el = this.cache_el
     }
-    const figure = document.createElement('p')
-    figure.style.textAlign = 'center'
     const img = document.createElement('img')
     img.style.maxWidth = '100%'
     let domImage: any
@@ -426,25 +427,43 @@ export default class Images {
       img.setAttribute('data-uid', uid)
     }
 
+    // caption
+    const caption = document.createElement('figcaption')
+    caption.innerHTML = '<span class="medium-editor-caption-placeholder">请输入图片描述</span>'
+    const listener = (event: any) => {
+      if (event.keyCode === 13) {
+        window.removeEventListener('keyup', listener)
+        // 删除 figcaption 的兄弟节点，给 el 的父节点添加新行
+        el.removeChild(caption.nextSibling)
+        const p = document.createElement('p')
+        p.innerHTML = '<br>'
+        el.parentNode.appendChild(p)
+        // move cursor
+        this.MediumEditor.selection.moveCursor(document, p, 0)
+      }
+      return true
+    }
+    window.addEventListener('keyup', listener)
+
     // If we're dealing with a preview image,
     // we don't have to preload it before displaying
     if (url.match(/^data:/)) {
       img.src = url
-      figure.appendChild(img)
-      // el.appendChild(figure)
       el.appendChild(img)
+      el.appendChild(caption)
     } else {
       domImage = new Image()
       domImage.onload = () => {
         img.src = domImage.src
-        figure.appendChild(img)
-        // el.appendChild(figure)
+        el.style.textAlign = 'center'
         el.appendChild(img)
+        el.appendChild(caption)
       }
       domImage.src = url
     }
     el.classList.add(this.elementClassName)
-    // Return domImage so we can test this function easily
+    el.contentediable = false
+    // Return domImage so we can test this function easily (just for testing)
     return domImage
   }
 
