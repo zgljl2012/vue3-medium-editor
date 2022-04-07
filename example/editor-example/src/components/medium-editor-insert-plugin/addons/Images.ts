@@ -217,9 +217,13 @@ export default class Images {
   _input: any
   captionClassName: string
   captionListener: any
+  imageID: number
+  cacheImages: any
   constructor (plugin: any, options: any, MediumEditor: any) {
     this.MediumEditor = MediumEditor
+    this.imageID = 0
     this.cache_el = null
+    this.cacheImages = {}
     this.options = {
       label: '<span class="fa fa-camera"></span>',
       preview: true,
@@ -247,17 +251,24 @@ export default class Images {
     this.captionListener = (event: any) => {
       if (event.keyCode === 13) {
         // 判断当前是否为 figcaption
-        let el = this._plugin.getCore().selectedElement
-        if (!el) {
-          el = this.cache_el
+        const span = this.MediumEditor.selection.getSelectionStart(this._editor.options.ownerDocument)
+        if (!span || !span.classList.contains(this.captionClassName)) {
+          return
         }
+        console.log(span, span.parentNode, span.parentNode.parentNode.classList)
+        // get the image ID
+        const imageID = span.getAttribute('image-id')
+        if (!imageID) {
+          return
+        }
+        console.log(this.cacheImages)
+        let el = this.cacheImages[parseInt(imageID, 10)]
         if (!el) {
           return
         }
-        console.log('----->>>>>', event, el, el.classList)
+        console.log('---->>>', el)
         if (el.classList.contains('medium-editor-insert-images')) {
           // 删除 el 的最后一个，移到下一行，如果没有的话，给 el 的父节点添加新行
-          let parent = el.parentNode
           if (el.lastChild.nodeName.toLowerCase() === 'p') {
             el.removeChild(el.lastChild)
           }
@@ -278,6 +289,10 @@ export default class Images {
     window.addEventListener('keyup', this.captionListener)
     // end.
 
+  }
+
+  nextImageID () {
+    return this.imageID++
   }
 
   getElementsByClassName (parents: any, className: any) {
@@ -456,8 +471,13 @@ export default class Images {
     if (!el) {
       el = this.cache_el
     }
+
+    const imageID = this.nextImageID()
     const img = document.createElement('img')
     img.style.maxWidth = '100%'
+
+    this.cacheImages[imageID] = el
+
     let domImage: any
 
     img.alt = ''
@@ -468,7 +488,7 @@ export default class Images {
 
     // caption
     const caption = document.createElement('figcaption')
-    caption.innerHTML = `<span class="${this.captionClassName}">请输入图片描述</span>`
+    caption.innerHTML = `<span image-id='${imageID}' class="${this.captionClassName}">请输入图片描述</span>`
 
     // If we're dealing with a preview image,
     // we don't have to preload it before displaying
