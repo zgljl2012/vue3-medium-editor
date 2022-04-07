@@ -1,4 +1,6 @@
 /* eslint-disable */
+import * as utils from '../utils'
+
 export const getToolbarButton = (MediumEditor: any) => {
   const ToolbarButton = MediumEditor.extensions.button.extend({
     init: function () {
@@ -293,15 +295,7 @@ export default class Images {
             if (el.lastChild.nodeName.toLowerCase() === 'p') {
               el.removeChild(el.lastChild)
             }
-            let nextChild = el.nextSibling
-            if (nextChild === null) {
-              const p = document.createElement('p')
-              p.innerHTML = '<br>'
-              el.parentNode.appendChild(p)
-              nextChild = p
-            }
-            // move cursor
-            this.MediumEditor.selection.moveCursor(document, nextChild, nextChild.childNodes.length)
+            utils.moveToNext(el)
           }
           return
         }
@@ -323,15 +317,7 @@ export default class Images {
           if (el.lastChild.nodeName.toLowerCase() === 'p') {
             el.removeChild(el.lastChild)
           }
-          let nextChild = el.nextSibling
-          if (nextChild === null) {
-            const p = document.createElement('p')
-            p.innerHTML = '<br>'
-            el.parentNode.appendChild(p)
-            nextChild = p
-          }
-          // move cursor
-          this.MediumEditor.selection.moveCursor(document, nextChild, nextChild.childNodes.length)
+          utils.moveToNext(el)
         }
       }
       return true
@@ -339,6 +325,18 @@ export default class Images {
     window.removeEventListener('keyup', this.captionListener)
     window.addEventListener('keyup', this.captionListener)
     // end.
+  }
+
+  moveToNext (el: any) {
+    let nextChild = el.nextSibling
+    if (nextChild === null) {
+      const p = document.createElement('p')
+      p.innerHTML = '<br>'
+      el.parentNode.appendChild(p)
+      nextChild = p
+    }
+    // move cursor
+    this.MediumEditor.selection.moveCursor(document, nextChild, nextChild.childNodes.length)
   }
 
   nextImageID () {
