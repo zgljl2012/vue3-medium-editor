@@ -251,14 +251,63 @@ export default class Images {
     this.captionListener = (event: any) => {
       if (event.keyCode === 13) {
         const elem = this.MediumEditor.selection.getSelectionStart(this._editor.options.ownerDocument)
+        console.log('----->>>>1', elem)
         // 判断当前是否为 img，即处理整个 figcaption 被删除的问题
         if (elem.previousSibling && elem.previousSibling.classList.contains(this.elementClassName)) {
           // 清除 elem 的 style，因为这个 style 是从 image 上复制过来的
           elem.style = ''
+          // 如果 elem 中包含 figcaption，则将 figcaption 移回 img 中
+          if (elem.childNodes[1] && elem.childNodes[1].tagName.toLowerCase() === 'figcaption') {
+            elem.previousSibling.appendChild(elem.childNodes[1])
+            elem.removeChild(elem.childNodes[1])
+          }
           return
         }
-        console.log('----->>>>>', elem.previousSibling)
         // TODO 判断当前是否为 figcaption，即处理 span 被删除的问题
+        console.log('----->>>>>', elem)
+        if (elem.tagName.toLowerCase() === 'figcaption') {
+          // 表明 figcaption 的内容被删除，需要删除此 figcaption
+          // 删除生成的兄弟节点，然后跳转到下一行（如果没有下一行就新增一行）
+          const el = elem.parentNode
+          console.log('----->>>222', elem.nextSibling, elem.previousSibling)
+          el.removeChild(elem.previousSibling)
+          el.removeChild(elem)
+
+          let next = el.nextSibling
+          if (!next) {
+            next = document.createElement('p')
+            next.innerHTML ='<br>'
+            el.parentNode.appendChild(next)
+          }
+          // move cursor
+          this.MediumEditor.selection.moveCursor(document, next, next.childNodes.length)
+          return
+        }
+        // 如果是 span，同时 parent 是 font，parent.parent 是 figcaption，则是说明是先删除完 span 再重新输入的情况
+        if (elem.tagName.toLowerCase() === 'span' && elem.parentNode.tagName.toLowerCase() === 'font' && elem.parentNode.parentNode.tagName.toLowerCase() === 'figcaption') {
+          const imageID = elem.parentNode.parentNode.getAttribute('image-id')
+          console.log('imageID', imageID)
+          let el = this.cacheImages[parseInt(imageID, 10)]
+          if (!el) {
+            return
+          }
+          if (el.classList.contains(this.elementClassName)) {
+            // 删除 el 的最后一个，移到下一行，如果没有的话，给 el 的父节点添加新行
+            if (el.lastChild.nodeName.toLowerCase() === 'p') {
+              el.removeChild(el.lastChild)
+            }
+            let nextChild = el.nextSibling
+            if (nextChild === null) {
+              const p = document.createElement('p')
+              p.innerHTML = '<br>'
+              el.parentNode.appendChild(p)
+              nextChild = p
+            }
+            // move cursor
+            this.MediumEditor.selection.moveCursor(document, nextChild, nextChild.childNodes.length)
+          }
+          return
+        }
         // 判断当前是否为 figcaption -> span
         if (!elem || !elem.classList.contains(this.captionClassName)) {
           return
