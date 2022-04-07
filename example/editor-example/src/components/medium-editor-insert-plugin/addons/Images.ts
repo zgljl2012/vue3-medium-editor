@@ -1,6 +1,8 @@
 /* eslint-disable */
 import * as utils from '../utils'
 
+const captionClassName = 'medium-editor-insert-image-caption'
+
 export const getToolbarButton = (MediumEditor: any) => {
   const ToolbarButton = MediumEditor.extensions.button.extend({
     init: function () {
@@ -25,6 +27,24 @@ export const getToolbarButton = (MediumEditor: any) => {
       }
       if (this.name === 'align-right') {
         el.parentNode.style['text-align'] = 'right'
+      }
+      if (this.name === 'caption') {
+        // 判断是否已存在 caption
+        const caption = el.nextSibling
+        if (!caption) {
+          const caption = this.document.createElement('figcaption')
+          const imageID = el.getAttribute('image-id')
+          caption.setAttribute('image-id', imageID)
+          caption.innerHTML = `<span image-id='${imageID}' class="${captionClassName}">请输入图片描述</span>`
+          el.parentNode.appendChild(caption)
+        } else {
+          // move cursor
+          let child = caption.firstChild
+          if (child.tagName.toLowerCase() === 'font') {
+            child = child.firstChild
+          }
+          MediumEditor.selection.moveCursor(this.document, child, child.childNodes.length)
+        }
       }
       el.classList.remove('medium-editor-insert-image-active')
       this.base.checkContentChanged()
@@ -243,7 +263,7 @@ export default class Images {
     // 上层用于辨识此插件的标识
     this.elementClassName = 'medium-editor-insert-images'
     this.activeClassName = 'medium-editor-insert-image-active'
-    this.captionClassName = 'medium-editor-insert-image-caption'
+    this.captionClassName = captionClassName
     this.label = this.options.label
 
     this.initToolbar()
@@ -282,10 +302,10 @@ export default class Images {
           this.MediumEditor.selection.moveCursor(document, next, next.childNodes.length)
           return
         }
+        // TODO 处理给 caption 做了加粗等处理的情况
         // 如果是 span，同时 parent 是 font，parent.parent 是 figcaption，则是说明是先删除完 span 再重新输入的情况
-        if (elem.tagName.toLowerCase() === 'span' && elem.parentNode.tagName.toLowerCase() === 'font' && elem.parentNode.parentNode.tagName.toLowerCase() === 'figcaption') {
+        if (elem.parentNode.tagName.toLowerCase() === 'font' && elem.parentNode.parentNode.tagName.toLowerCase() === 'figcaption') {
           const imageID = elem.parentNode.parentNode.getAttribute('image-id')
-          console.log('imageID', imageID)
           let el = this.cacheImages[parseInt(imageID, 10)]
           if (!el) {
             return
@@ -432,6 +452,11 @@ export default class Images {
           name: 'align-right',
           action: 'right',
           label: 'Right'
+        },
+        {
+          name: 'caption',
+          action: 'add-caption',
+          label: 'Add Caption'
         }
       ]
     })
