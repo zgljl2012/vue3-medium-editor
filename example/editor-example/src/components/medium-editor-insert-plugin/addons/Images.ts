@@ -263,13 +263,11 @@ export default class Images {
           }
           return
         }
-        // TODO 判断当前是否为 figcaption，即处理 span 被删除的问题
-        console.log('----->>>>>', elem)
+        // 判断当前是否为 figcaption，即处理 span 被删除的问题
         if (elem.tagName.toLowerCase() === 'figcaption') {
           // 表明 figcaption 的内容被删除，需要删除此 figcaption
           // 删除生成的兄弟节点，然后跳转到下一行（如果没有下一行就新增一行）
           const el = elem.parentNode
-          console.log('----->>>222', elem.nextSibling, elem.previousSibling)
           el.removeChild(elem.previousSibling)
           el.removeChild(elem)
 
