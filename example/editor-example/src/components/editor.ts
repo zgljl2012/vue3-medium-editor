@@ -30,8 +30,8 @@ export default defineComponent({
         return {
           toolbar: {
             buttons: ['h2', 'h3', 'bold', 'italic', 'underline', 'strikethrough',
-              'highlighter', 'anchor', 'unorderedlist', 'orderedlist', 'quote', 'pre',
-              'justifyLeft', 'justifyCenter', 'justifyRight', 'fontsize']
+              'highlighter', 'anchor', 'unorderedlist', 'orderedlist', 'quote',
+              'justifyLeft', 'justifyCenter', 'justifyRight']
           },
           paste: {
             forcePlainText: false,
