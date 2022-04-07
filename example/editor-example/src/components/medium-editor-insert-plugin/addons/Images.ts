@@ -215,6 +215,7 @@ export default class Images {
   label: any
   toolbar: any
   _input: any
+  captionClassName: string
   captionListener: any
   constructor (plugin: any, options: any, MediumEditor: any) {
     this.MediumEditor = MediumEditor
@@ -236,6 +237,7 @@ export default class Images {
     // 上层用于辨识此插件的标识
     this.elementClassName = 'medium-editor-insert-images'
     this.activeClassName = 'medium-editor-insert-image-active'
+    this.captionClassName = 'medium-editor-insert-image-caption'
     this.label = this.options.label
 
     this.initToolbar()
@@ -466,7 +468,7 @@ export default class Images {
 
     // caption
     const caption = document.createElement('figcaption')
-    caption.innerHTML = '<span class="medium-editor-caption-placeholder">请输入图片描述</span>'
+    caption.innerHTML = `<span class="${this.captionClassName}">请输入图片描述</span>`
 
     // If we're dealing with a preview image,
     // we don't have to preload it before displaying

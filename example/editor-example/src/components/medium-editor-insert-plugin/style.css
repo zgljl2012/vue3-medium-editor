@@ -11,6 +11,11 @@
     text-decoration: underline;
     cursor: pointer;
 }
+
+.medium-editor-insert-image-caption {
+    font-size: 0.8em;
+    color: #aeaeae;
+}
     
 .medium-editor-insert-buttons .medium-editor-insert-buttons-show {
     box-sizing: border-box;
