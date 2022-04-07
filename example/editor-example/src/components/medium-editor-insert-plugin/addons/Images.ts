@@ -251,7 +251,6 @@ export default class Images {
     this.captionListener = (event: any) => {
       if (event.keyCode === 13) {
         const elem = this.MediumEditor.selection.getSelectionStart(this._editor.options.ownerDocument)
-        console.log('----->>>>1', elem)
         // 判断当前是否为 img，即处理整个 figcaption 被删除的问题
         if (elem.previousSibling && elem.previousSibling.classList.contains(this.elementClassName)) {
           // 清除 elem 的 style，因为这个 style 是从 image 上复制过来的
