@@ -250,24 +250,29 @@ export default class Images {
     // listen for editing figcaptions
     this.captionListener = (event: any) => {
       if (event.keyCode === 13) {
-        // 判断当前是否为 figcaption
-        const span = this.MediumEditor.selection.getSelectionStart(this._editor.options.ownerDocument)
-        if (!span || !span.classList.contains(this.captionClassName)) {
+        const elem = this.MediumEditor.selection.getSelectionStart(this._editor.options.ownerDocument)
+        // 判断当前是否为 img，即处理整个 figcaption 被删除的问题
+        if (elem.previousSibling && elem.previousSibling.classList.contains(this.elementClassName)) {
+          // 清除 elem 的 style，因为这个 style 是从 image 上复制过来的
+          elem.style = ''
           return
         }
-        console.log(span, span.parentNode, span.parentNode.parentNode.classList)
+        console.log('----->>>>>', elem.previousSibling)
+        // TODO 判断当前是否为 figcaption，即处理 span 被删除的问题
+        // 判断当前是否为 figcaption -> span
+        if (!elem || !elem.classList.contains(this.captionClassName)) {
+          return
+        }
         // get the image ID
-        const imageID = span.getAttribute('image-id')
+        const imageID = elem.getAttribute('image-id')
         if (!imageID) {
           return
         }
-        console.log(this.cacheImages)
         let el = this.cacheImages[parseInt(imageID, 10)]
         if (!el) {
           return
         }
-        console.log('---->>>', el)
-        if (el.classList.contains('medium-editor-insert-images')) {
+        if (el.classList.contains(this.elementClassName)) {
           // 删除 el 的最后一个，移到下一行，如果没有的话，给 el 的父节点添加新行
           if (el.lastChild.nodeName.toLowerCase() === 'p') {
             el.removeChild(el.lastChild)
@@ -288,7 +293,6 @@ export default class Images {
     window.removeEventListener('keyup', this.captionListener)
     window.addEventListener('keyup', this.captionListener)
     // end.
-
   }
 
   nextImageID () {
@@ -474,6 +478,7 @@ export default class Images {
 
     const imageID = this.nextImageID()
     const img = document.createElement('img')
+    img.setAttribute('image-id', `${imageID}`)
     img.style.maxWidth = '100%'
 
     this.cacheImages[imageID] = el
@@ -488,6 +493,7 @@ export default class Images {
 
     // caption
     const caption = document.createElement('figcaption')
+    caption.setAttribute('image-id', `${imageID}`)
     caption.innerHTML = `<span image-id='${imageID}' class="${this.captionClassName}">请输入图片描述</span>`
 
     // If we're dealing with a preview image,
