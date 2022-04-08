@@ -2,6 +2,7 @@ import * as MediumEditor from "medium-editor-x";
 import { Extension, IExtensionsManager } from "./types";
 import { ImageOptions, Image } from "./image";
 import * as utils from './utils'
+import variables from './variables'
 
 class ExtensionManager implements IExtensionsManager {
   extensions: Extension[] = [];
@@ -34,7 +35,7 @@ class ExtensionManager implements IExtensionsManager {
     this._plugin.on(document, "keyup", this.toggleButtons.bind(this));
     this._plugin.on(
       this.buttons.getElementsByClassName(
-        "medium-editor-insert-buttons-show"
+        variables.SHOW_BUTTONS_CLASS
       )[0],
       "click",
       this.toggleAddons.bind(this)
@@ -43,7 +44,7 @@ class ExtensionManager implements IExtensionsManager {
     // This could be written in one statement when medium-editor 5.15.2 is released
     // https://github.com/yabwe/medium-editor/pull/1046
     const addonActions = this.buttons.getElementsByClassName(
-      "medium-editor-insert-action"
+      variables.ACTION_CLASS
     );
     Array.prototype.forEach.call(addonActions, (action) => {
       this._plugin.on(action, "click", this.handleAddonClick.bind(this));
@@ -56,17 +57,17 @@ class ExtensionManager implements IExtensionsManager {
     let html: any;
 
     this.buttons = document.createElement("div");
-    this.buttons.id = `medium-editor-insert-${this._plugin.getEditorId()}`;
-    this.buttons.classList.add("medium-editor-insert-buttons");
+    this.buttons.id = `${variables.BASE_CLASS_PREFIX}${this._plugin.getEditorId()}`;
+    this.buttons.classList.add(variables.BUTTONS_CLASS);
     this.buttons.setAttribute("contentediable", false);
 
-    html = `<a class='medium-editor-insert-buttons-show' style="border-color: rgba(0,0,0,.68); padding-top: 2px;"><svg class="svgIcon-use" width="25" height="25"><path d="M20 12h-7V5h-1v7H5v1h7v7h1v-7h7" fill-rule="evenodd"></path></svg></a>
-    <ul class='medium-editor-insert-buttons-addons'>`;
+    html = `<a class='${variables.SHOW_BUTTONS_CLASS}' style="border-color: rgba(0,0,0,.68); padding-top: 2px;"><svg class="svgIcon-use" width="25" height="25"><path d="M20 12h-7V5h-1v7H5v1h7v7h1v-7h7" fill-rule="evenodd"></path></svg></a>
+    <ul class='${variables.ADDONS_BUTTONS_CLASS}'>`;
 
     // 遍历插件
     this.extensions.forEach((extension) => {
       console.log('----->>>>', extension)
-      html += `<li><a class='medium-editor-insert-action' data-addon='${extension.name}'>${extension.label}</a></li>`;
+      html += `<li><a class='${variables.ACTION_CLASS}' ${variables.ATTR_DATA_ADDON}='${extension.name}'>${extension.label}</a></li>`;
     });
 
     html += "</ul>";
@@ -83,7 +84,7 @@ class ExtensionManager implements IExtensionsManager {
   positionButtons() {
     // Don't position buttons if they aren't active
     if (
-      this.buttons.classList.contains("medium-editor-insert-buttons-active") ===
+      this.buttons.classList.contains(variables.ACTIVE_BUTTONS_CLASS) ===
       false
     ) {
       return;
@@ -92,10 +93,10 @@ class ExtensionManager implements IExtensionsManager {
     const el = this._editor.getSelectedParentElement();
     const elPosition = el.getBoundingClientRect();
     const addons = this.buttons.getElementsByClassName(
-      "medium-editor-insert-buttons-addons"
+     variables.ADDONS_BUTTONS_CLASS
     )[0];
     const addonButton = this.buttons.getElementsByClassName(
-      "medium-editor-insert-action"
+      variables.ACTION_CLASS
     )[0];
     const addonsStyle = window.getComputedStyle(addons);
     const addonButtonStyle = window.getComputedStyle(addonButton);
@@ -120,16 +121,6 @@ class ExtensionManager implements IExtensionsManager {
 
   toggleButtons(e: any) {
     const el = this._editor.getSelectedParentElement();
-
-    // 如果 el 中包含 medium-editor-insert-image 这个类，但子元素中又没有 img，则移除 medium-editor-insert-image
-    if (e.keyCode === this.MediumEditor.util.keyCode.ENTER) {
-      if (
-        el.classList.contains("medium-editor-insert-images") &&
-        el.getElementsByTagName("img").length === 0
-      ) {
-        el.classList.remove("medium-editor-insert-images");
-      }
-    }
 
     if (this.shouldDisplayButtonsOnElement(el)) {
       this.selectElement(el);
@@ -193,21 +184,21 @@ class ExtensionManager implements IExtensionsManager {
   }
 
   showButtons() {
-    this.buttons.classList.add("medium-editor-insert-buttons-active");
+    this.buttons.classList.add(variables.ACTIVE_BUTTONS_CLASS);
     this.positionButtons();
   }
 
   hideButtons() {
-    this.buttons.classList.remove("medium-editor-insert-buttons-active");
-    this.buttons.classList.remove("medium-editor-insert-addons-active");
+    this.buttons.classList.remove(variables.ACTIVE_BUTTONS_CLASS);
+    this.buttons.classList.remove(variables.ACTIVE_ADDONS_CLASS);
   }
 
   toggleAddons() {
-    this.buttons.classList.toggle("medium-editor-insert-addons-active");
+    this.buttons.classList.toggle(variables.ACTIVE_ADDONS_CLASS);
   }
 
   handleAddonClick(e: any) {
-    const name = e.currentTarget.getAttribute("data-addon");
+    const name = e.currentTarget.getAttribute(variables.ATTR_DATA_ADDON);
 
     e.preventDefault();
 
@@ -217,15 +208,7 @@ class ExtensionManager implements IExtensionsManager {
 
 export const createExtensionManager = ({ imageOptions }: {imageOptions: ImageOptions}) => {
   const extensions = MediumEditor.Extension.extend({
-    name: "insert",
-
-    // delete
-    addons: {
-      images: {},
-      embeds: true,
-    },
-    _initializedAddons: {},
-    // end
+    name: "extensions",
 
     init: function () {
       // eslint-disable-next-line prefer-rest-params
@@ -244,16 +227,7 @@ export const createExtensionManager = ({ imageOptions }: {imageOptions: ImageOpt
     },
     destroy: function () {
       this.extensionsManager.removeButtons();
-    },
-
-    // delete
-    getAddons: function () {
-      return this._initializedAddons;
-    },
-    getAddon: function (name) {
-      return this._initializedAddons[name];
-    },
-    // end
+    }
   });
   return extensions;
 };

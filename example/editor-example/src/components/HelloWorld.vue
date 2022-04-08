@@ -10,7 +10,7 @@ import { defineComponent } from 'vue'
 // import editor1 from './editor'
 import editor1 from 'vue3-medium-editor'
 
-const TEST_1 = '<p>Hello world</p><p class="medium-editor-insert-images" style="text-align: center;"><img image-id="0" alt="" src="https://www.google.com.hk/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png" style="max-width: 100%;" class=""><figcaption image-id="0"><span image-id="0" class="medium-editor-insert-image-caption">请输入图片描述</span></figcaption></p><p></p>'
+const TEST_1 = '<p>Hello world</p><p class="medium-editor-insert-images" style="text-align: center;"><img image-id="0" alt="" src="https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png" style="max-width: 100%;" class=""><figcaption image-id="0"><span image-id="0" class="medium-editor-insert-image-caption">请输入图片描述</span></figcaption></p><p></p>'
 
 export default defineComponent({
   name: 'HelloWorld',
@@ -32,7 +32,7 @@ export default defineComponent({
     onClickImage (cb: (url: string) => void) {
       console.log('click image1')
       // eslint-disable-next-line node/no-callback-literal
-      cb('https://www.google.com.hk/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png')
+      cb('https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png')
     }
   }
 })

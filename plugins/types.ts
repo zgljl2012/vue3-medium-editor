@@ -7,5 +7,6 @@ export interface Extension {
 
 export interface IExtensionsManager {
   addExtension(extension: any): void
+  render()
 }
 

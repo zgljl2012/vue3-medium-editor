@@ -11,12 +11,12 @@ export const createEditorInsert = (imageOptions: ImageOptions) => {
   const MediumEditorInsert = MediumEditor.Extension.extend({
     name: 'insert',
 
-    addons: {
-      images: imageOptions || {},
-      embeds: true
-    },
+    // addons: {
+    //   images: imageOptions || {},
+    //   embeds: true
+    // },
 
-    _initializedAddons: {},
+    // _initializedAddons: {},
 
     init: function () {
       // eslint-disable-next-line prefer-rest-params
@@ -33,13 +33,13 @@ export const createEditorInsert = (imageOptions: ImageOptions) => {
     //   return this.core
     // },
 
-    getAddons: function () {
-      return this._initializedAddons
-    },
+    // getAddons: function () {
+    //   return this._initializedAddons
+    // },
 
-    getAddon: function (name: string) {
-      return this._initializedAddons[name]
-    }
+    // getAddon: function (name: string) {
+    //   return this._initializedAddons[name]
+    // }
   })
 
   return MediumEditorInsert
