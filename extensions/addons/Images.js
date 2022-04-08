@@ -420,17 +420,19 @@ export default class Images {
     insertImage(url, uid) {
         let el = this._plugin.getCore().selectedElement;
         // 需 el 的父元素是 div[class="medium-editor-element"]，el 本身为 <p>，即一级段落
-        while (!el.parentNode.classList.contains('medium-editor-element')) {
-            const current = el;
-            el = el.parentNode;
-            el.removeChild(current);
-        }
-        // 删除 el 中的 <br>
-        const children = el.childNodes;
-        for (const i in children) {
-            const child = children[i];
-            if (child.nodeName === 'BR') {
-                el.removeChild(child);
+        if (el) {
+            while (!el.parentNode.classList.contains('medium-editor-element')) {
+                const current = el;
+                el = el.parentNode;
+                el.removeChild(current);
+            }
+            // 删除 el 中的 <br>
+            const children = el.childNodes;
+            for (const i in children) {
+                const child = children[i];
+                if (child.nodeName === 'BR') {
+                    el.removeChild(child);
+                }
             }
         }
         if (!el) {
