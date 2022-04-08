@@ -1,8 +1,13 @@
 /* eslint-disable */
 import Core from './Core'
+import * as MediumEditor from 'medium-editor-x'
+
+export interface ImageOptions {
+  onClick(cb: (url: string) => void)
+}
 
 
-export const createEditorInsert = (MediumEditor: any, imageOptions: any) => {
+export const createEditorInsert = (imageOptions: ImageOptions) => {
   const MediumEditorInsert = MediumEditor.Extension.extend({
     name: 'insert',
 
@@ -24,9 +29,9 @@ export const createEditorInsert = (MediumEditor: any, imageOptions: any) => {
       this.core.removeButtons()
     },
 
-    getCore: function () {
-      return this.core
-    },
+    // getCore: function () {
+    //   return this.core
+    // },
 
     getAddons: function () {
       return this._initializedAddons

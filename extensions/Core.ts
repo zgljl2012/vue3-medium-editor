@@ -1,6 +1,18 @@
 /* eslint-disable */
 import Images from './addons/Images'
 import Embeds from './addons/Embeds'
+import { Extension, IExtensionsManager } from '../plugins/types'
+
+class ExtensionManager implements IExtensionsManager {
+  extensions: Extension[] = []
+
+  constructor() {
+  }
+
+  addExtension(extension: Extension): void {
+    this.extensions.push(extension)
+  }
+}
 
 export default class Core {
   _plugin: any
@@ -12,8 +24,11 @@ export default class Core {
     this._plugin = plugin
     this._editor = this._plugin.base
     this.MediumEditor = MediumEditor
+    // 初始化插件
     this.initAddons()
+    // 添加按钮
     this.addButtons()
+    // 绑定事件
     this.events()
   }
 
@@ -30,8 +45,6 @@ export default class Core {
   }
 
   events () {
-    // This could be chained when medium-editor 5.15.2 is released
-    // https://github.com/yabwe/medium-editor/pull/1046
     this._plugin.on(document, 'click', this.toggleButtons.bind(this))
     this._plugin.on(document, 'keyup', this.toggleButtons.bind(this))
     this._plugin.on(
@@ -56,6 +69,7 @@ export default class Core {
 
   initAddons () {
     // Initialize all default addons, we'll delete ones we don't need later
+    // 初始化所有默认插件
     this._plugin._initializedAddons = {
       images: new Images(
         this._plugin,
@@ -70,6 +84,7 @@ export default class Core {
     }
 
     Object.keys(this._plugin.addons).forEach(name => {
+      // 获取插件的配置项
       const AddonOptions = this._plugin.addons[name]
 
       // If the addon is custom one
@@ -86,6 +101,7 @@ export default class Core {
       }
 
       // Delete disabled addon
+      // 如果没有启用，则删除
       if (!AddonOptions) {
         delete this._plugin._initializedAddons[name]
       }

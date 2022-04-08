@@ -1,6 +1,7 @@
 /* eslint-disable */
 import Core from './Core';
-export const createEditorInsert = (MediumEditor, imageOptions) => {
+import * as MediumEditor from 'medium-editor-x';
+export const createEditorInsert = (imageOptions) => {
     const MediumEditorInsert = MediumEditor.Extension.extend({
         name: 'insert',
         addons: {
@@ -16,9 +17,9 @@ export const createEditorInsert = (MediumEditor, imageOptions) => {
         destroy: function () {
             this.core.removeButtons();
         },
-        getCore: function () {
-            return this.core;
-        },
+        // getCore: function () {
+        //   return this.core
+        // },
         getAddons: function () {
             return this._initializedAddons;
         },

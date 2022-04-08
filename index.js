@@ -4,7 +4,7 @@ import * as MediumEditor from 'medium-editor-x';
 import 'medium-editor/dist/css/medium-editor.min.css';
 import 'medium-editor/dist/css/themes/default.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import { createEditorInsert } from './extensions';
+import { createExtensionManager } from './plugins';
 import './style.css';
 import './extensions/style.css';
 export default defineComponent({
@@ -87,13 +87,16 @@ export default defineComponent({
         },
         createAndSubscribe() {
             // plugins
-            const MediumEditorInsert = createEditorInsert(MediumEditor, {
-                onClick: this.onClickImage
+            const MediumEditorInsert = createExtensionManager({
+                imageOptions: {
+                    onClick: this.onClickImage
+                }
             });
+            const insertPlugin = new MediumEditorInsert();
             const options = {
                 ...this.options,
                 extensions: {
-                    insert: new MediumEditorInsert()
+                    insert: insertPlugin
                 }
             };
             this.getElement().innerHTML = this.text || '';
