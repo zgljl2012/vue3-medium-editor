@@ -1,5 +1,6 @@
 import * as MediumEditor from "medium-editor-x";
 import { Image } from "./image";
+import * as utils from './utils';
 class ExtensionManager {
     constructor(plugin, MediumEditor) {
         this.extensions = [];
@@ -17,16 +18,6 @@ class ExtensionManager {
     addExtension(extension) {
         this.extensions.push(extension);
         this.extensionsMapping[extension.name] = extension;
-    }
-    getClosestWithClassName(el, className) {
-        return this.MediumEditor.util.traverseUp(el, (element) => {
-            return element.classList.contains(className);
-        });
-    }
-    isChildOf(el, parent) {
-        return this.MediumEditor.util.traverseUp(el, (element) => {
-            return element === parent;
-        });
     }
     events() {
         this._plugin.on(document, "click", this.toggleButtons.bind(this));
@@ -115,7 +106,7 @@ class ExtensionManager {
         }
         // Don't show buttons when the editor doesn't belong to editor
         this._plugin.getEditorElements().forEach((editor) => {
-            if (this.isChildOf(el, editor)) {
+            if (utils.isChildOf(el, editor)) {
                 belongsToEditor = true;
             }
         });
@@ -133,7 +124,7 @@ class ExtensionManager {
         // - when the element has an addon class, or some of its parents have it
         addonClassNames.forEach((className) => {
             if (el.classList.contains(className) ||
-                this.getClosestWithClassName(el, className)) {
+                utils.getClosestWithClassName(el, className)) {
                 isAddon = true;
             }
         });

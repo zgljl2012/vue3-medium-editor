@@ -1,6 +1,7 @@
 import * as MediumEditor from "medium-editor-x";
 import { Extension, IExtensionsManager } from "./types";
 import { ImageOptions, Image } from "./image";
+import * as utils from './utils'
 
 class ExtensionManager implements IExtensionsManager {
   extensions: Extension[] = [];
@@ -26,18 +27,6 @@ class ExtensionManager implements IExtensionsManager {
   addExtension(extension: Extension): void {
     this.extensions.push(extension);
     this.extensionsMapping[extension.name] = extension
-  }
-
-  getClosestWithClassName(el: any, className: any) {
-    return this.MediumEditor.util.traverseUp(el, (element: any) => {
-      return element.classList.contains(className);
-    });
-  }
-
-  isChildOf(el: any, parent: any) {
-    return this.MediumEditor.util.traverseUp(el, (element: any) => {
-      return element === parent;
-    });
   }
 
   events() {
@@ -164,7 +153,7 @@ class ExtensionManager implements IExtensionsManager {
 
     // Don't show buttons when the editor doesn't belong to editor
     this._plugin.getEditorElements().forEach((editor: any) => {
-      if (this.isChildOf(el, editor)) {
+      if (utils.isChildOf(el, editor)) {
         belongsToEditor = true;
       }
     });
@@ -186,7 +175,7 @@ class ExtensionManager implements IExtensionsManager {
     addonClassNames.forEach((className: any) => {
       if (
         el.classList.contains(className) ||
-        this.getClosestWithClassName(el, className)
+        utils.getClosestWithClassName(el, className)
       ) {
         isAddon = true;
       }
