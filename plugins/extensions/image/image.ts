@@ -25,7 +25,7 @@ export class ImageExtension implements Extension {
 
   toolbar: any
   imageID: number = 0
-  cacheImages: any = {}
+  cacheImages: object = {}
 
   constructor(plugin: any, options: ImageOptions) {
     Object.assign(this.options, options)
@@ -40,6 +40,34 @@ export class ImageExtension implements Extension {
     this._plugin.on(document, 'keyup', this.captionHandler.bind(this))
 
     // TODO 预处理当前编辑器中的内容
+    this.preprocess()
+  }
+
+  private preprocess() {
+    // 处理 figcaption 错位的问题
+    const figcaptions = this._editor.elements[0].getElementsByTagName('figcaption')
+    console.log(figcaptions)
+    for(const figcaption of figcaptions) {
+      // 删除 figcaption 的 next 元素
+      if (figcaption.nextSibling) {
+        figcaption.nextSibling.remove()
+      }
+      // 将 figcaption 移到前一个 p 中
+      const prev = figcaption.previousSibling
+      prev.appendChild(figcaption)
+      // 缓存 Image
+      this.cacheImages[figcaption.getAttribute('data-image-id')] = prev
+      const imageID = parseInt(figcaption.getAttribute('data-image-id'), 10)
+      this.imageID = Math.max(this.imageID, imageID + 1)
+    }
+    // 清理掉所有的空 p
+    const ps = this._editor.elements[0].getElementsByTagName('p')
+    for(const p of ps) {
+      if (p.innerHTML === '') {
+        p.remove()
+      }
+    }
+    console.log(this._editor.getContent())
   }
 
   // 处理在图片后面回车的情况
@@ -86,7 +114,7 @@ export class ImageExtension implements Extension {
     // 如果是 span，同时 parent 是 font，parent.parent 是 figcaption，则是说明是先删除完 span 再重新输入的情况
     if (elem.parentNode.tagName.toLowerCase() === 'font' && elem.parentNode.parentNode.tagName.toLowerCase() === 'figcaption') {
       const imageID = elem.parentNode.parentNode.getAttribute('data-image-id')
-      let el = this.cacheImages[parseInt(imageID, 10)]
+      let el = this.cacheImages[imageID]
       if (!el) {
         return false
       }
@@ -118,7 +146,7 @@ export class ImageExtension implements Extension {
       return false
     }
     // 获取图片元素
-    let el = this.cacheImages[parseInt(imageID, 10)]
+    let el = this.cacheImages[imageID]
     if (!el) {
       return false
     }
@@ -163,8 +191,8 @@ export class ImageExtension implements Extension {
     }
   }
 
-  private nextImageID () {
-    return this.imageID++
+  private nextImageID (): string {
+    return `${this.imageID++}`
   }
 
   private events () {
@@ -250,7 +278,7 @@ export class ImageExtension implements Extension {
 
     // caption
     const caption = document.createElement('figcaption')
-    caption.setAttribute('data', `${imageID}`)
+    caption.setAttribute('data-image-id', `${imageID}`)
     caption.innerHTML = `<span data-image-id='${imageID}' class="${captionClassName}">请输入图片描述</span>`
 
     // If we're dealing with a preview image,
