@@ -3,6 +3,7 @@ import { Extension, IExtensionsManager } from "./types";
 import { ImageOptions, Image } from "./image";
 import * as utils from './utils'
 import variables from './variables'
+import ExtensionsHtmlRender from './builder'
 
 class ExtensionManager implements IExtensionsManager {
   extensions: Extension[] = [];
@@ -19,8 +20,17 @@ class ExtensionManager implements IExtensionsManager {
   }
 
   render() {
+    // render by render
+    const _builder = new ExtensionsHtmlRender({editorId: this._plugin.getEditorId()});
+    this.extensions.forEach(extension => {
+      _builder.add(extension)
+    })
+    this._elem = _builder
+      .mount(document.body)
+      .render()
+
     // 添加按钮
-    this._renderElem();
+    // this._renderElem();
     // 绑定事件
     this.bindEvents();
   }
