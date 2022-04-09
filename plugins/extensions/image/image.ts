@@ -38,6 +38,8 @@ export class ImageExtension implements Extension {
 
     // listen for editing figcaptions
     this._plugin.on(document, 'keyup', this.captionHandler.bind(this))
+
+    // TODO 预处理当前编辑器中的内容
   }
 
   // 处理在图片后面回车的情况
@@ -83,7 +85,7 @@ export class ImageExtension implements Extension {
   private handleEnterAfterReInputCaption (elem: any): boolean {
     // 如果是 span，同时 parent 是 font，parent.parent 是 figcaption，则是说明是先删除完 span 再重新输入的情况
     if (elem.parentNode.tagName.toLowerCase() === 'font' && elem.parentNode.parentNode.tagName.toLowerCase() === 'figcaption') {
-      const imageID = elem.parentNode.parentNode.getAttribute('image-id')
+      const imageID = elem.parentNode.parentNode.getAttribute('data-image-id')
       let el = this.cacheImages[parseInt(imageID, 10)]
       if (!el) {
         return false
@@ -107,7 +109,7 @@ export class ImageExtension implements Extension {
       return false
     }
     // get the image ID
-    const imageID = elem.getAttribute('image-id')
+    const imageID = elem.getAttribute('data-image-id')
     if (!imageID) {
       return false
     }
@@ -152,10 +154,10 @@ export class ImageExtension implements Extension {
   }
 
   private events () {
-    this._plugin.on(document, 'click', this.unselectImage.bind(this))
+    this._plugin.on(document, 'click', this.unselect.bind(this))
 
     this._plugin.getEditorElements().forEach((editor: any) => {
-      this._plugin.on(editor, 'click', this.selectImage.bind(this))
+      this._plugin.on(editor, 'click', this.select.bind(this))
     })
   }
 
@@ -163,7 +165,7 @@ export class ImageExtension implements Extension {
     // 如果设置了回调，则交给回调处理，只接收回调函数传回的图片 URL
     if (this.options.onClick && typeof this.options.onClick === 'function') {
       this.options.onClick((imgUrl: any) => {
-        this.insertImage(imgUrl, null)
+        this.render(imgUrl)
       })
       return
     }
@@ -202,7 +204,7 @@ export class ImageExtension implements Extension {
     this._editor.extensions.push(this.toolbar)
   }
 
-  private insertImage (url: any, uid: any) {
+  private render (url: any) {
     let el = this._editor.getSelectedParentElement();
     // 需 el 的父元素是 div[class="medium-editor-element"]，el 本身为 <p>，即一级段落
     if (el) {
@@ -223,7 +225,7 @@ export class ImageExtension implements Extension {
 
     const imageID = this.nextImageID()
     const img = document.createElement('img')
-    img.setAttribute('image-id', `${imageID}`)
+    img.setAttribute('data-image-id', `${imageID}`)
     img.style.maxWidth = '100%'
 
     this.cacheImages[imageID] = el
@@ -232,14 +234,10 @@ export class ImageExtension implements Extension {
 
     img.alt = ''
 
-    if (uid) {
-      img.setAttribute('data-uid', uid)
-    }
-
     // caption
     const caption = document.createElement('figcaption')
-    caption.setAttribute('image-id', `${imageID}`)
-    caption.innerHTML = `<span image-id='${imageID}' class="${captionClassName}">请输入图片描述</span>`
+    caption.setAttribute('data', `${imageID}`)
+    caption.innerHTML = `<span data-image-id='${imageID}' class="${captionClassName}">请输入图片描述</span>`
 
     // If we're dealing with a preview image,
     // we don't have to preload it before displaying
@@ -263,7 +261,7 @@ export class ImageExtension implements Extension {
     return domImage
   }
 
-  private selectImage (e: any) {
+  private select (e: any) {
     const el = e.target
 
     if (
@@ -275,7 +273,7 @@ export class ImageExtension implements Extension {
     }
   }
 
-  private unselectImage (e: any) {
+  private unselect (e: any) {
     const el = e.target
     let clickedImage: any
 
