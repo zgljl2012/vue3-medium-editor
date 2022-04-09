@@ -130,7 +130,19 @@ export class ImageExtension implements Extension {
   }
 
   private captionHandler (event: any) {
-    // TODO caption 的全选删除，删除时，不能把下一行的内容填充到 fagcaption 中
+    // 处理 caption 的全选删除
+    if (event.key === 'Backspace') {
+      const elem = MediumEditor.selection.getSelectionStart(this._editor.options.ownerDocument)
+      console.log('---->>>>>>', elem)
+      if (elem.tagName.toLowerCase() === 'figcaption') {
+        // 如果 figcaption 中的内容全部删除，则删除 figcaption
+        const parentNode = elem.parentNode
+        if (elem.innerHTML === '<br>') {
+          parentNode.removeChild(elem)
+        }
+        utils.moveToNext(parentNode)
+      }
+    }
     // TODO 不允许变化 caption 的 style
     if (event.keyCode === 13) {
       const elem = MediumEditor.selection.getSelectionStart(this._editor.options.ownerDocument)

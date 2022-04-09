@@ -30,9 +30,9 @@ export const getToolbarButton = (MediumEditor: any) => {
         const caption = el.nextSibling
         if (!caption) {
           const caption = this.document.createElement('figcaption')
-          const imageID = el.getAttribute('image-id')
-          caption.setAttribute('image-id', imageID)
-          caption.innerHTML = `<span image-id='${imageID}' class="${captionClassName}">请输入图片描述</span>`
+          const imageID = el.getAttribute('data-image-id')
+          caption.setAttribute('data-image-id', imageID)
+          caption.innerHTML = `<span data-image-id='${imageID}' class="${captionClassName}">请输入图片描述</span>`
           el.parentNode.appendChild(caption)
         } else {
           // move cursor
