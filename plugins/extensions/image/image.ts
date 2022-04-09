@@ -104,9 +104,13 @@ export class ImageExtension implements Extension {
 
   // 处理在 caption 后面回车的情况
   private handleEnterAfterCaption (elem: any): boolean {
-    // 如不是 caption 元素，则直接退出
+    // 如不是 caption 元素，则检查上层父节点（可能 caption 被添加了 style）
     if (!elem || !elem.classList.contains(captionClassName)) {
-      return false
+      const target = utils.getClosestWithClassName(elem, captionClassName)
+      if (!target) {
+        return false
+      }
+      elem = target
     }
     // get the image ID
     const imageID = elem.getAttribute('data-image-id')
@@ -142,7 +146,6 @@ export class ImageExtension implements Extension {
         utils.moveToNext(parentNode)
       }
     }
-    // TODO 不允许变化 caption 的 style
     if (event.keyCode === 13) {
       const elem = MediumEditor.selection.getSelectionStart(this._editor.options.ownerDocument)
       // 判断当前的上个元素是否为 img，处理从图片末尾回车和整个 figcaption 被删除的问题
