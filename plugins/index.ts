@@ -75,14 +75,12 @@ class ExtensionManager implements IExtensionsManager {
   }
 
   _renderElem () {
-    let html: string;
-
     this._elem = document.createElement("div");
     this._elem.id = `${variables.BASE_CLASS_PREFIX}${this._plugin.getEditorId()}`;
     this._elem.classList.add(variables.BUTTONS_CLASS);
     this._elem.setAttribute(variables.ATTR_CONTENT_EDITABLE, 'false');
 
-    html += this._renderExtensions();
+    const html = this._renderExtensions();
 
     this._elem.innerHTML = html;
 
