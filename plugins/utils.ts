@@ -23,3 +23,9 @@ export function isChildOf(el: HTMLElement, parent: string) {
     return element === parent;
   });
 }
+
+export default {
+  moveToNext,
+  getClosestWithClassName,
+  isChildOf
+}

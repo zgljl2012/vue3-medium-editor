@@ -3,17 +3,6 @@ import Images from './addons/Images'
 import Embeds from './addons/Embeds'
 import { Extension, IExtensionsManager } from '../plugins/types'
 
-class ExtensionManager implements IExtensionsManager {
-  extensions: Extension[] = []
-
-  constructor() {
-  }
-
-  addExtension(extension: Extension): void {
-    this.extensions.push(extension)
-  }
-}
-
 export default class Core {
   _plugin: any
   _editor: any
