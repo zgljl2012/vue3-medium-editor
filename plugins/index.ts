@@ -10,7 +10,7 @@ class ExtensionManager implements IExtensionsManager {
   _plugin: any;
   _editor: any;
   MediumEditor: any;
-  buttons: any;
+  _elem: HTMLElement;
   selectedElement: any;
   constructor(plugin: any, MediumEditor: any) {
     this._plugin = plugin;
@@ -20,9 +20,9 @@ class ExtensionManager implements IExtensionsManager {
 
   render() {
     // 添加按钮
-    this.addButtons();
+    this._renderElem();
     // 绑定事件
-    this.events();
+    this.bindEvents();
   }
 
   addExtension(extension: Extension): void {
@@ -30,20 +30,18 @@ class ExtensionManager implements IExtensionsManager {
     this.extensionsMapping[extension.name] = extension
   }
 
-  events() {
+  bindEvents () {
     this._plugin.on(document, "click", this.toggleButtons.bind(this));
     this._plugin.on(document, "keyup", this.toggleButtons.bind(this));
     this._plugin.on(
-      this.buttons.getElementsByClassName(
+      this._elem.getElementsByClassName(
         variables.SHOW_BUTTONS_CLASS
       )[0],
       "click",
       this.toggleAddons.bind(this)
     );
 
-    // This could be written in one statement when medium-editor 5.15.2 is released
-    // https://github.com/yabwe/medium-editor/pull/1046
-    const addonActions = this.buttons.getElementsByClassName(
+    const addonActions = this._elem.getElementsByClassName(
       variables.ACTION_CLASS
     );
     Array.prototype.forEach.call(addonActions, (action) => {
@@ -53,38 +51,52 @@ class ExtensionManager implements IExtensionsManager {
     this._plugin.on(window, "resize", this.positionButtons.bind(this));
   }
 
-  addButtons() {
-    let html: any;
+  _renderExtensionsIcon () : string {
+    const svgPath = '<path d="M20 12h-7V5h-1v7H5v1h7v7h1v-7h7" fill-rule="evenodd"></path>'
+    const iconClass = 'svgIcon-use'
+    const width = 25
+    const height = 25
+    let html = `<svg class="${iconClass}" width="${width}" height="${height}">${svgPath}</svg>`;
+    return html
+  }
 
-    this.buttons = document.createElement("div");
-    this.buttons.id = `${variables.BASE_CLASS_PREFIX}${this._plugin.getEditorId()}`;
-    this.buttons.classList.add(variables.BUTTONS_CLASS);
-    this.buttons.setAttribute("contentediable", false);
-
-    html = `<a class='${variables.SHOW_BUTTONS_CLASS}' style="border-color: rgba(0,0,0,.68); padding-top: 2px;"><svg class="svgIcon-use" width="25" height="25"><path d="M20 12h-7V5h-1v7H5v1h7v7h1v-7h7" fill-rule="evenodd"></path></svg></a>
+  _renderExtensions () : string {
+    const styles = 'border-color: rgba(0,0,0,.68); padding-top: 2px;'
+    let html = `<a class='${variables.SHOW_BUTTONS_CLASS}' style="${styles}">${this._renderExtensionsIcon()}</a>
     <ul class='${variables.ADDONS_BUTTONS_CLASS}'>`;
 
     // 遍历插件
     this.extensions.forEach((extension) => {
-      console.log('----->>>>', extension)
       html += `<li><a class='${variables.ACTION_CLASS}' ${variables.ATTR_DATA_ADDON}='${extension.name}'>${extension.label}</a></li>`;
     });
 
     html += "</ul>";
+    return html
+  }
 
-    this.buttons.innerHTML = html;
+  _renderElem () {
+    let html: string;
 
-    document.body.appendChild(this.buttons);
+    this._elem = document.createElement("div");
+    this._elem.id = `${variables.BASE_CLASS_PREFIX}${this._plugin.getEditorId()}`;
+    this._elem.classList.add(variables.BUTTONS_CLASS);
+    this._elem.setAttribute(variables.ATTR_CONTENT_EDITABLE, 'false');
+
+    html += this._renderExtensions();
+
+    this._elem.innerHTML = html;
+
+    document.body.appendChild(this._elem);
   }
 
   removeButtons() {
-    this.buttons.remove();
+    this._elem.remove();
   }
 
   positionButtons() {
     // Don't position buttons if they aren't active
     if (
-      this.buttons.classList.contains(variables.ACTIVE_BUTTONS_CLASS) ===
+      this._elem.classList.contains(variables.ACTIVE_BUTTONS_CLASS) ===
       false
     ) {
       return;
@@ -92,10 +104,10 @@ class ExtensionManager implements IExtensionsManager {
 
     const el = this._editor.getSelectedParentElement();
     const elPosition = el.getBoundingClientRect();
-    const addons = this.buttons.getElementsByClassName(
+    const addons = this._elem.getElementsByClassName(
      variables.ADDONS_BUTTONS_CLASS
     )[0];
-    const addonButton = this.buttons.getElementsByClassName(
+    const addonButton = this._elem.getElementsByClassName(
       variables.ACTION_CLASS
     )[0];
     const addonsStyle = window.getComputedStyle(addons);
@@ -115,11 +127,12 @@ class ExtensionManager implements IExtensionsManager {
     // In that case, align buttons with the editor
     position.left = position.left < 0 ? elPosition.left : position.left;
 
-    this.buttons.style.left = `${position.left}px`;
-    this.buttons.style.top = `${position.top}px`;
+    this._elem.style.left = `${position.left}px`;
+    this._elem.style.top = `${position.top}px`;
   }
 
-  toggleButtons(e: any) {
+  toggleButtons(e: Event) {
+    // 触发检查，检查是否应该显示响应元素
     const el = this._editor.getSelectedParentElement();
 
     if (this.shouldDisplayButtonsOnElement(el)) {
@@ -131,8 +144,8 @@ class ExtensionManager implements IExtensionsManager {
     }
   }
 
+  // 是否应该显示按钮
   shouldDisplayButtonsOnElement(el: any) {
-    const addons = this._plugin.getAddons();
     const addonClassNames: any = [];
     let isAddon = false;
     let belongsToEditor = false;
@@ -154,15 +167,16 @@ class ExtensionManager implements IExtensionsManager {
     }
 
     // Get class names used by addons
-    Object.keys(addons).forEach((addonName) => {
-      const addon = addons[addonName];
-      if (addon.elementClassName) {
-        addonClassNames.push(addon.elementClassName);
+    this.extensions.forEach((extension) => {
+      if (extension.elementClassName) {
+        addonClassNames.push(extension.elementClassName);
       }
     });
 
     // Don't show buttons if the element is an addon element
     // - when the element has an addon class, or some of its parents have it
+    // 如果元素是插件元素，则不显示按钮
+    // - 当元素有插件类名，或者其父元素有插件类名
     addonClassNames.forEach((className: any) => {
       if (
         el.classList.contains(className) ||
@@ -184,20 +198,21 @@ class ExtensionManager implements IExtensionsManager {
   }
 
   showButtons() {
-    this.buttons.classList.add(variables.ACTIVE_BUTTONS_CLASS);
+    this._elem.classList.add(variables.ACTIVE_BUTTONS_CLASS);
     this.positionButtons();
   }
 
   hideButtons() {
-    this.buttons.classList.remove(variables.ACTIVE_BUTTONS_CLASS);
-    this.buttons.classList.remove(variables.ACTIVE_ADDONS_CLASS);
+    this._elem.classList.remove(variables.ACTIVE_BUTTONS_CLASS);
+    this._elem.classList.remove(variables.ACTIVE_ADDONS_CLASS);
   }
 
   toggleAddons() {
-    this.buttons.classList.toggle(variables.ACTIVE_ADDONS_CLASS);
+    this._elem.classList.toggle(variables.ACTIVE_ADDONS_CLASS);
   }
 
   handleAddonClick(e: any) {
+    // 点击插件
     const name = e.currentTarget.getAttribute(variables.ATTR_DATA_ADDON);
 
     e.preventDefault();

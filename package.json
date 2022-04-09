@@ -2,12 +2,12 @@
   "name": "vue3-medium-editor",
   "version": "0.0.3",
   "description": "A medium editor for vue 3.x",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "dev": "cd example/editor-example && yarn serve",
     "sync": "npm run compile && scripts/sync",
-    "compile": "tsc",
+    "compile": "tsc && cp style.css dist/ && mkdir -p dist/plugins/styles/ && cp -r plugins/styles/*.css dist/plugins/styles/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

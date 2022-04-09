@@ -8,3 +8,4 @@ cp style.css $target_dir/index.css
 cp -r extensions/ $target_dir/extensions/
 cp -r plugins/ $target_dir/plugins/
 cp package.json $target_dir/package.json
+cp -r dist/ $target_dir/dist/

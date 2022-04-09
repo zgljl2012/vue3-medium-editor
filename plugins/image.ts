@@ -8,6 +8,7 @@ export class Image implements Extension {
   options: ImageOptions
   name: string = 'image'
   label: string = '<span class="fa fa-camera"></span>'
+  elementClassName: string = 'medium-editor-extensions-image'
   constructor(options: ImageOptions) {
     this.options = options
   }

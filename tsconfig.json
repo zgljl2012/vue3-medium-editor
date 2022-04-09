@@ -3,7 +3,9 @@
       "target": "esnext",
       "module": "esnext",
       "strict": false,
-      "moduleResolution": "node"
+      "moduleResolution": "node",
+      "declaration": true,
+      "outDir": "./dist",
     },
     "include": [
       "index.ts"

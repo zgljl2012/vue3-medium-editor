@@ -11,5 +11,6 @@ export default {
 
   // attributes
   ATTR_DATA_ADDON: 'data-addon',
+  ATTR_CONTENT_EDITABLE: 'contentediable'
 
 }

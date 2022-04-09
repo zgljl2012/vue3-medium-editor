@@ -6,7 +6,7 @@ import 'medium-editor/dist/css/themes/default.min.css'
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import { createExtensionManager } from './plugins'
 import './style.css'
-import './extensions/style.css'
+import './plugins/styles/style.css'
 
 export default defineComponent({
   name: 'medium-editor',
