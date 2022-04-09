@@ -4,19 +4,27 @@ import { ImageOptions, Image } from "./image";
 import * as utils from './utils'
 import variables from './variables'
 import ExtensionsHtmlRender from './builder'
+import {timer} from './decorator'
 
 class ExtensionManager implements IExtensionsManager {
   extensions: Extension[] = [];
   extensionsMapping: { [key: string]: Extension } = {};
+  extensionsClassNames: string[] = []
   _plugin: any;
   _editor: any;
   _elem: HTMLElement;
   selectedElement: any;
+
+  // 缓存
+  addonsLeft: number
+  addon1MarginLeft: number
+
   constructor(plugin: any) {
     this._plugin = plugin;
     this._editor = this._plugin.base;
   }
 
+  @timer
   render() {
     // render by render
     const _builder = new ExtensionsHtmlRender({editorId: this._plugin.getEditorId()});
@@ -27,6 +35,16 @@ class ExtensionManager implements IExtensionsManager {
       .mount(document.body)
       .render()
 
+    // 缓存
+    const addons = this._elem.getElementsByClassName(
+      variables.ADDONS_BUTTONS_CLASS
+     )[0];
+     const addonButton1 = this._elem.getElementsByClassName(
+       variables.ACTION_CLASS
+     )[0];
+     this.addonsLeft = parseInt(window.getComputedStyle(addons).left, 10);
+     this.addon1MarginLeft = parseInt(window.getComputedStyle(addonButton1).marginLeft, 10);
+
     // 绑定事件
     this.bindEvents();
   }
@@ -34,6 +52,7 @@ class ExtensionManager implements IExtensionsManager {
   addExtension(extension: Extension): void {
     this.extensions.push(extension);
     this.extensionsMapping[extension.name] = extension
+    this.extensionsClassNames.push(extension.elementClassName)
   }
 
   private bindEvents () {
@@ -54,15 +73,16 @@ class ExtensionManager implements IExtensionsManager {
       this._plugin.on(action, "click", this.handleAddonClick.bind(this));
     });
 
-    this._plugin.on(window, "resize", this.positionButtons.bind(this));
+    this._plugin.on(window, "resize", this.reposition.bind(this));
   }
 
   destroy() {
     this._elem.remove();
   }
 
-  private positionButtons() {
+  private reposition() {
     // Don't position buttons if they aren't active
+    // 根据计时结果，此部分最时间
     if (
       this._elem.classList.contains(variables.ACTIVE_BUTTONS_CLASS) ===
       false
@@ -72,14 +92,6 @@ class ExtensionManager implements IExtensionsManager {
 
     const el = this._editor.getSelectedParentElement();
     const elPosition = el.getBoundingClientRect();
-    const addons = this._elem.getElementsByClassName(
-     variables.ADDONS_BUTTONS_CLASS
-    )[0];
-    const addonButton = this._elem.getElementsByClassName(
-      variables.ACTION_CLASS
-    )[0];
-    const addonsStyle = window.getComputedStyle(addons);
-    const addonButtonStyle = window.getComputedStyle(addonButton);
 
     // Calculate position
     const position = {
@@ -87,8 +99,8 @@ class ExtensionManager implements IExtensionsManager {
       left:
         window.scrollX +
         elPosition.left -
-        parseInt(addonsStyle.left, 10) -
-        parseInt(addonButtonStyle.marginLeft, 10),
+        this.addonsLeft -
+        this.addon1MarginLeft
     };
 
     // If left position is lower than 0, the buttons would be out of the viewport.
@@ -119,47 +131,23 @@ class ExtensionManager implements IExtensionsManager {
 
   // 是否应该显示按钮
   private shouldDisplayButtonsOnElement(el: HTMLElement) {
-    const addonClassNames: string[] = [];
-    let isAddon = false;
-    let belongsToEditor = false;
-
     // Don't show buttons when the element has text
     if (!el || !el.innerText || el.innerText.trim() !== "") {
       return false;
     }
+    return this.belongsToEditor(el) && !this.isAddon(el);
+  }
 
-    // Don't show buttons when the editor doesn't belong to editor
-    this._plugin.getEditorElements().forEach((editor: any) => {
-      if (utils.isChildOf(el, editor)) {
-        belongsToEditor = true;
-      }
+  private belongsToEditor(el: HTMLElement) {
+    return this._plugin.getEditorElements().some((editor: any) => {
+      return utils.isChildOf(el, editor);
     });
+  }
 
-    if (!belongsToEditor) {
-      return false;
-    }
-
-    // Get class names used by addons
-    this.extensions.forEach((extension) => {
-      if (extension.elementClassName) {
-        addonClassNames.push(extension.elementClassName);
-      }
+  private isAddon(el: HTMLElement): boolean {
+    return this.extensionsClassNames.some((className: any) => {
+      return el.classList.contains(className);
     });
-
-    // Don't show buttons if the element is an addon element
-    // - when the element has an addon class, or some of its parents have it
-    // 如果元素是插件元素，则不显示按钮
-    // - 当元素有插件类名，或者其父元素有插件类名
-    addonClassNames.forEach((className: any) => {
-      if (
-        el.classList.contains(className) ||
-        utils.getClosestWithClassName(el, className)
-      ) {
-        isAddon = true;
-      }
-    });
-
-    return !isAddon;
   }
 
   private selectElement(el: any) {
@@ -172,7 +160,7 @@ class ExtensionManager implements IExtensionsManager {
 
   private show() {
     this._elem.classList.add(variables.ACTIVE_BUTTONS_CLASS);
-    this.positionButtons();
+    this.reposition();
   }
 
   private hide() {
