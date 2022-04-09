@@ -10,13 +10,11 @@ class ExtensionManager implements IExtensionsManager {
   extensionsMapping: { [key: string]: Extension } = {};
   _plugin: any;
   _editor: any;
-  MediumEditor: any;
   _elem: HTMLElement;
   selectedElement: any;
-  constructor(plugin: any, MediumEditor: any) {
+  constructor(plugin: any) {
     this._plugin = plugin;
     this._editor = this._plugin.base;
-    this.MediumEditor = MediumEditor;
   }
 
   render() {
@@ -38,7 +36,7 @@ class ExtensionManager implements IExtensionsManager {
     this.extensionsMapping[extension.name] = extension
   }
 
-  bindEvents () {
+  private bindEvents () {
     this._plugin.on(document, "click", this.toggleButtons.bind(this));
     this._plugin.on(document, "keyup", this.toggleButtons.bind(this));
     this._plugin.on(
@@ -59,11 +57,11 @@ class ExtensionManager implements IExtensionsManager {
     this._plugin.on(window, "resize", this.positionButtons.bind(this));
   }
 
-  removeButtons() {
+  destroy() {
     this._elem.remove();
   }
 
-  positionButtons() {
+  private positionButtons() {
     // Don't position buttons if they aren't active
     if (
       this._elem.classList.contains(variables.ACTIVE_BUTTONS_CLASS) ===
@@ -101,7 +99,7 @@ class ExtensionManager implements IExtensionsManager {
     this._elem.style.top = `${position.top}px`;
   }
 
-  toggleButtons(e: Event) {
+  private toggleButtons(e: Event) {
     // 触发检查，检查是否应该显示响应元素
     const el = this._editor.getSelectedParentElement();
 
@@ -115,7 +113,7 @@ class ExtensionManager implements IExtensionsManager {
   }
 
   // 是否应该显示按钮
-  shouldDisplayButtonsOnElement(el: any) {
+  private shouldDisplayButtonsOnElement(el: any) {
     const addonClassNames: any = [];
     let isAddon = false;
     let belongsToEditor = false;
@@ -159,34 +157,33 @@ class ExtensionManager implements IExtensionsManager {
     return !isAddon;
   }
 
-  selectElement(el: any) {
+  private selectElement(el: any) {
     this.selectedElement = el;
   }
 
-  deselectElement() {
+  private deselectElement() {
     this.selectedElement = null;
   }
 
-  showButtons() {
+  private showButtons() {
     this._elem.classList.add(variables.ACTIVE_BUTTONS_CLASS);
     this.positionButtons();
   }
 
-  hideButtons() {
+  private hideButtons() {
     this._elem.classList.remove(variables.ACTIVE_BUTTONS_CLASS);
     this._elem.classList.remove(variables.ACTIVE_ADDONS_CLASS);
   }
 
-  toggleAddons() {
+  private toggleAddons() {
+    // 切换状态
     this._elem.classList.toggle(variables.ACTIVE_ADDONS_CLASS);
   }
 
-  handleAddonClick(e: any) {
+  private handleAddonClick(e: any) {
     // 点击插件
     const name = e.currentTarget.getAttribute(variables.ATTR_DATA_ADDON);
-
     e.preventDefault();
-
     this.extensionsMapping[name].handleClick(e);
   }
 }
@@ -200,7 +197,7 @@ export const createExtensionsManager = ({ imageOptions }: {imageOptions: ImageOp
       MediumEditor.Extension.prototype.init.apply(this, arguments);
 
       // Create extensions manager
-      this.extensionsManager = new ExtensionManager(this, MediumEditor);
+      this.extensionsManager = new ExtensionManager(this);
 
       // init extensions
       const imageExtension = new Image(imageOptions);
@@ -212,7 +209,7 @@ export const createExtensionsManager = ({ imageOptions }: {imageOptions: ImageOp
       this.extensionsManager.render();
     },
     destroy: function () {
-      this.extensionsManager.removeButtons();
+      this.extensionsManager.destroy();
     }
   });
   return extensions;

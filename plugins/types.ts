@@ -19,6 +19,7 @@ export interface IExtensionsHtmlRender {
 
 export interface IExtensionsManager {
   addExtension(extension: any): void
+  destroy()
   render()
 }
 

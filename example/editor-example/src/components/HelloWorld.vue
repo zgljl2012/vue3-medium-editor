@@ -22,7 +22,7 @@ export default defineComponent({
   },
   data () {
     return {
-      text: TEST_1
+      text: '' // TEST_1
     }
   },
   methods: {
