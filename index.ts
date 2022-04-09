@@ -4,7 +4,7 @@ import * as MediumEditor from 'medium-editor-x'
 import 'medium-editor/dist/css/medium-editor.min.css'
 import 'medium-editor/dist/css/themes/default.min.css'
 import '@fortawesome/fontawesome-free/css/all.min.css'
-import { createExtensionManager } from './plugins'
+import { createExtensionsManager } from './plugins'
 import './style.css'
 import './plugins/styles/style.css'
 
@@ -88,7 +88,7 @@ export default defineComponent({
     },
     createAndSubscribe () {
       // plugins
-      const MediumEditorInsert = createExtensionManager(
+      const MediumEditorInsert = createExtensionsManager(
         {
           imageOptions: {
             onClick: this.onClickImage

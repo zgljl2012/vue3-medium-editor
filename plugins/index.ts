@@ -29,8 +29,6 @@ class ExtensionManager implements IExtensionsManager {
       .mount(document.body)
       .render()
 
-    // 添加按钮
-    // this._renderElem();
     // 绑定事件
     this.bindEvents();
   }
@@ -59,42 +57,6 @@ class ExtensionManager implements IExtensionsManager {
     });
 
     this._plugin.on(window, "resize", this.positionButtons.bind(this));
-  }
-
-  _renderExtensionsIcon () : string {
-    const svgPath = '<path d="M20 12h-7V5h-1v7H5v1h7v7h1v-7h7" fill-rule="evenodd"></path>'
-    const iconClass = 'svgIcon-use'
-    const width = 25
-    const height = 25
-    let html = `<svg class="${iconClass}" width="${width}" height="${height}">${svgPath}</svg>`;
-    return html
-  }
-
-  _renderExtensions () : string {
-    const styles = 'border-color: rgba(0,0,0,.68); padding-top: 2px;'
-    let html = `<a class='${variables.SHOW_BUTTONS_CLASS}' style="${styles}">${this._renderExtensionsIcon()}</a>
-    <ul class='${variables.ADDONS_BUTTONS_CLASS}'>`;
-
-    // 遍历插件
-    this.extensions.forEach((extension) => {
-      html += `<li><a class='${variables.ACTION_CLASS}' ${variables.ATTR_DATA_ADDON}='${extension.name}'>${extension.label}</a></li>`;
-    });
-
-    html += "</ul>";
-    return html
-  }
-
-  _renderElem () {
-    this._elem = document.createElement("div");
-    this._elem.id = `${variables.BASE_CLASS_PREFIX}${this._plugin.getEditorId()}`;
-    this._elem.classList.add(variables.BUTTONS_CLASS);
-    this._elem.setAttribute(variables.ATTR_CONTENT_EDITABLE, 'false');
-
-    const html = this._renderExtensions();
-
-    this._elem.innerHTML = html;
-
-    document.body.appendChild(this._elem);
   }
 
   removeButtons() {
@@ -229,7 +191,7 @@ class ExtensionManager implements IExtensionsManager {
   }
 }
 
-export const createExtensionManager = ({ imageOptions }: {imageOptions: ImageOptions}) => {
+export const createExtensionsManager = ({ imageOptions }: {imageOptions: ImageOptions}) => {
   const extensions = MediumEditor.Extension.extend({
     name: "extensions",
 
@@ -239,6 +201,7 @@ export const createExtensionManager = ({ imageOptions }: {imageOptions: ImageOpt
 
       // Create extensions manager
       this.extensionsManager = new ExtensionManager(this, MediumEditor);
+
       // init extensions
       const imageExtension = new Image(imageOptions);
 
