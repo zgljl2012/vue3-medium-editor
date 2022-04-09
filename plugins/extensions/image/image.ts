@@ -12,49 +12,31 @@ export interface ImageOptions {
 export class ImageExtension implements Extension {
   // options: ImageOptions
   name: string = 'image'
-  // label: string = '<span class="fa fa-camera"></span>'
-  // elementClassName: string = 'medium-editor-extensions-image'
+  label: string = '<span class="fa fa-camera"></span>'
 
-  MediumEditor: any
-  // eslint-disable-next-line camelcase
-  cache_el: any
-  options: any
+  options: ImageOptions = {
+    // 如果 click 不为空且为一个函数，则点击时将调用 click(cb)，cb 为一个回调函数，需传入图片地址
+    onClick: null
+  }
   _plugin: any
   _editor: any
-  elementClassName: any
-  activeClassName: any
-  label: any
+
+  // class name
+  elementClassName: string = 'medium-editor-insert-images'
+  activeClassName: string = 'medium-editor-insert-image-active'
+  captionClassName: string = captionClassName
   toolbar: any
-  _input: any
-  captionClassName: string
   captionListener: any
-  imageID: number
-  cacheImages: any
+  imageID: number = 0
+
+  cachedElement: any = null
+  cacheImages: any = {}
 
   constructor(plugin: any, options: ImageOptions) {
-    this.MediumEditor = MediumEditor
-    this.imageID = 0
-    this.cache_el = null
-    this.cacheImages = {}
-    this.options = {
-      label: '<span class="fa fa-camera"></span>',
-      preview: true,
-      uploadUrl: 'upload.php',
-      deleteUrl: 'delete.php',
-      onClick: null, // 如果 click 不为空且为一个函数，则点击时将调用 click(cb)，cb 为一个回调函数，需传入图片地址
-      deleteMethod: 'DELETE',
-      deleteData: {}
-    }
-
     Object.assign(this.options, options)
 
     this._plugin = plugin
     this._editor = this._plugin.base
-    // 上层用于辨识此插件的标识
-    this.elementClassName = 'medium-editor-insert-images'
-    this.activeClassName = 'medium-editor-insert-image-active'
-    this.captionClassName = captionClassName
-    this.label = this.options.label
 
     this.initToolbar()
     this.events()
@@ -62,7 +44,7 @@ export class ImageExtension implements Extension {
     // listen for editing figcaptions
     this.captionListener = (event: any) => {
       if (event.keyCode === 13) {
-        const elem = this.MediumEditor.selection.getSelectionStart(this._editor.options.ownerDocument)
+        const elem = MediumEditor.selection.getSelectionStart(this._editor.options.ownerDocument)
         // 判断当前是否为 img，即处理整个 figcaption 被删除的问题
         if (elem.previousSibling && elem.previousSibling.classList.contains(this.elementClassName)) {
           // 清除 elem 的 style，因为这个 style 是从 image 上复制过来的
@@ -89,7 +71,7 @@ export class ImageExtension implements Extension {
             el.parentNode.appendChild(next)
           }
           // move cursor
-          this.MediumEditor.selection.moveCursor(document, next, next.childNodes.length)
+          MediumEditor.selection.moveCursor(document, next, next.childNodes.length)
           return
         }
         // TODO 处理给 caption 做了加粗等处理的情况
@@ -137,65 +119,12 @@ export class ImageExtension implements Extension {
     // end.
   }
 
-  moveToNext (el: any) {
-    let nextChild = el.nextSibling
-    if (nextChild === null) {
-      const p = document.createElement('p')
-      p.innerHTML = '<br>'
-      el.parentNode.appendChild(p)
-      nextChild = p
-    }
-    // move cursor
-    this.MediumEditor.selection.moveCursor(document, nextChild, nextChild.childNodes.length)
-  }
-
-  nextImageID () {
+  private nextImageID () {
     return this.imageID++
   }
 
-  getElementsByClassName (parents: any, className: any) {
-    const results: any = []
-
-    Array.prototype.forEach.call(parents, editor => {
-      const elements = editor.getElementsByClassName(className)
-
-      Array.prototype.forEach.call(elements, element => {
-        results.push(element)
-      })
-    })
-
-    return results
-  }
-
-  generateRandomString (length = 15) {
-    return Math.random()
-      .toString(36)
-      .substr(2, length)
-  }
-
-  getClosestWithClassName (el: any, className: any) {
-    return this.MediumEditor.util.traverseUp(el, (element: any) => {
-      return element.classList.contains(className)
-    })
-  }
-
-  getElementsByTagName (parents: any, tagName: any) {
-    const results: any = []
-
-    Array.prototype.forEach.call(parents, editor => {
-      const elements = editor.getElementsByTagName(tagName)
-
-      Array.prototype.forEach.call(elements, element => {
-        results.push(element)
-      })
-    })
-
-    return results
-  }
-
-  events () {
+  private events () {
     this._plugin.on(document, 'click', this.unselectImage.bind(this))
-    // this._plugin.on(document, 'keydown', this.removeImage.bind(this))
 
     this._plugin.getEditorElements().forEach((editor: any) => {
       this._plugin.on(editor, 'click', this.selectImage.bind(this))
@@ -203,24 +132,18 @@ export class ImageExtension implements Extension {
   }
 
   handleClick () {
+    // 如果设置了回调，则交给回调处理，只接收回调函数传回的图片 URL
     if (this.options.onClick && typeof this.options.onClick === 'function') {
-      this.cache_el = this._plugin.selectedElement
+      this.cachedElement = this._plugin.selectedElement
       this.options.onClick((imgUrl: any) => {
         this.insertImage(imgUrl, null)
       })
       return
     }
-    // 否则创建一个 input 进行图片上传
-    this._input = document.createElement('input')
-    this._input.type = 'file'
-    this._input.multiple = true
-
-    this._plugin.on(this._input, 'change', this.uploadFiles.bind(this))
-
-    this._input.click()
+    // TODO 支持图片上传
   }
 
-  initToolbar () {
+  private initToolbar () {
     this.toolbar = new Toolbar({
       plugin: this._plugin,
       type: 'images',
@@ -252,67 +175,7 @@ export class ImageExtension implements Extension {
     this._editor.extensions.push(this.toolbar)
   }
 
-  uploadFiles () {
-    const paragraph = this._plugin.selectedElement
-
-    // Replace paragraph with div, because figure is a block element
-    // and can't be nested inside paragraphs
-    if (paragraph.nodeName.toLowerCase() === 'p') {
-      const div = document.createElement('div')
-
-      paragraph.parentNode.insertBefore(div, paragraph)
-      this._plugin.selectElement(div)
-      paragraph.remove()
-    }
-
-    Array.prototype.forEach.call(this._input.files, file => {
-      // Generate uid for this image, so we can identify it later
-      // and we can replace preview image with uploaded one
-      const uid = this.generateRandomString()
-
-      if (this.options.preview) {
-        this.preview(file, uid)
-      }
-
-      this.upload(file, uid)
-    })
-
-    this._plugin.hideButtons()
-  }
-
-  preview (file: any, uid: any) {
-    const reader = new FileReader()
-
-    reader.onload = e => {
-      this.insertImage(e.target?.result, uid)
-    }
-
-    reader.readAsDataURL(file)
-  }
-
-  upload (file: any, uid: any) {
-    const xhr = new XMLHttpRequest()
-    const data = new FormData()
-
-    xhr.open('POST', this.options.uploadUrl, true)
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === 4 && xhr.status === 200) {
-        const image = this._plugin
-          .selectedElement.querySelector(`[data-uid='${uid}']`)
-
-        if (image) {
-          this.replaceImage(image, xhr.responseText)
-        } else {
-          this.insertImage(xhr.responseText, null)
-        }
-      }
-    }
-
-    data.append('file', file)
-    xhr.send(data)
-  }
-
-  insertImage (url: any, uid: any) {
+  private insertImage (url: any, uid: any) {
     let el = this._editor.getSelectedParentElement();
     // 需 el 的父元素是 div[class="medium-editor-element"]，el 本身为 <p>，即一级段落
     if (el) {
@@ -331,7 +194,7 @@ export class ImageExtension implements Extension {
       }
     }
     if (!el) {
-      el = this.cache_el
+      el = this.cachedElement
     }
 
     const imageID = this.nextImageID()
@@ -376,21 +239,7 @@ export class ImageExtension implements Extension {
     return domImage
   }
 
-  replaceImage (image: any, url: any) {
-    const domImage = new Image()
-
-    domImage.onload = () => {
-      image.src = domImage.src
-      image.removeAttribute('data-uid')
-    }
-
-    domImage.src = url
-
-    // Return domImage so we can test this function easily
-    return domImage
-  }
-
-  selectImage (e: any) {
+  private selectImage (e: any) {
     const el = e.target
 
     if (
@@ -402,7 +251,7 @@ export class ImageExtension implements Extension {
     }
   }
 
-  unselectImage (e: any) {
+  private unselectImage (e: any) {
     const el = e.target
     let clickedImage: any
 
@@ -414,7 +263,7 @@ export class ImageExtension implements Extension {
       clickedImage = el
     }
 
-    const images = this.getElementsByClassName(
+    const images = utils.getElementsByClassName(
       this._plugin.getEditorElements(),
       this.activeClassName
     )

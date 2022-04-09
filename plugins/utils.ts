@@ -24,8 +24,23 @@ export function isChildOf(el: HTMLElement, parent: string) {
   });
 }
 
+export function getElementsByClassName (parents: HTMLElement[], className: string) {
+  const results: HTMLElement[] = []
+
+  Array.prototype.forEach.call(parents, editor => {
+    const elements = editor.getElementsByClassName(className)
+
+    Array.prototype.forEach.call(elements, element => {
+      results.push(element)
+    })
+  })
+
+  return results
+}
+
 export default {
   moveToNext,
   getClosestWithClassName,
-  isChildOf
+  isChildOf,
+  getElementsByClassName
 }
