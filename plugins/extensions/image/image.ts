@@ -133,7 +133,6 @@ export class ImageExtension implements Extension {
     // 处理 caption 的全选删除
     if (event.key === 'Backspace') {
       const elem = MediumEditor.selection.getSelectionStart(this._editor.options.ownerDocument)
-      console.log('---->>>>>>', elem)
       if (elem.tagName.toLowerCase() === 'figcaption') {
         // 如果 figcaption 中的内容全部删除，则删除 figcaption
         const parentNode = elem.parentNode
