@@ -85,10 +85,11 @@ export default defineComponent({
       this.$emit('edit', { event, editor: this.editor, content: this.editor?.getContent() })
     },
     tearDown () {
+      window.removeEventListener('keydown', this.onGlobalKeyDown)
       this.editor?.unsubscribe('editableInput', this.emit)
       this.editor?.destroy()
     },
-    onGlobalKeyDoen(e: KeyboardEvent) {
+    onGlobalKeyDown(e: KeyboardEvent) {
       // 解决全局无内容时，还按删除键的问题
       if (e.key === 'Backspace' && this.editor && this.editor?.getContent() === EMPTY_CONTENT) {
         e.preventDefault()
@@ -112,7 +113,7 @@ export default defineComponent({
       }
 
       // 订阅全局事件，解决全局无内容时，还按删除键的问题
-      window.addEventListener('keydown', this.onGlobalKeyDoen)
+      window.addEventListener('keydown', this.onGlobalKeyDown)
 
       this.getElement().innerHTML = this.text || EMPTY_CONTENT
       this.editor = new MediumEditor(`#${this.elementID}`, options)
