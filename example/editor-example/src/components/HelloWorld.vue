@@ -1,33 +1,29 @@
 <template>
-  <div style="margin-left: 3em; margin-right: 3em;">
-    <hr/>
-    <editor1 :text="text" @edit='edit' :onClickImage="onClickImage" />
+  <div class="editor" style="margin-left: 25%; margin-right: 25%;">
+    <editor :text="text" @edit='edit' :onClickImage="onClickImage" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-// import editor1 from './editor'
-import editor1 from 'vue3-medium-editor'
-
-const TEST_1 = '<p>Hello world</p><p class="medium-editor-insert-images" style="text-align: center;"><img data-image-id="0" alt="" src="https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png" style="max-width: 100%;" class=""><figcaption data-image-id="0"><span data-image-id="0" class="medium-editor-insert-image-caption">请输入图片描述</span></figcaption></p><p></p>'
+import editor from 'vue3-medium-editor'
 
 export default defineComponent({
   name: 'HelloWorld',
   components: {
-    editor1
+    editor
   },
   props: {
     msg: String
   },
   data () {
     return {
-      text: TEST_1
+      text: ''
     }
   },
   methods: {
     edit (op: {content: string}) {
-      // console.log(op.content)
+      console.log(op.content)
     },
     onClickImage (cb: (url: string) => void) {
       console.log('click image1')
@@ -41,18 +37,13 @@ export default defineComponent({
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
-h3 {
-  margin: 40px 0 0;
+.editor {
+  background: #fafafa;
+  padding: 24px;
+  padding-left: 48px;
+  padding-right: 48px;
+  box-shadow: 3px 1px 5px 1px #87878755;
+  min-height: 1000px;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+
 </style>
