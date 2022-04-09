@@ -102,19 +102,24 @@ class ExtensionManager implements IExtensionsManager {
   private toggleButtons(e: Event) {
     // 触发检查，检查是否应该显示响应元素
     const el = this._editor.getSelectedParentElement();
+    // 检查 el 是否为 editor 元素本身，如果是，直接显示
+    if (el && el.classList.contains('medium-editor')) {
+      this.show();
+      return
+    }
 
     if (this.shouldDisplayButtonsOnElement(el)) {
       this.selectElement(el);
-      this.showButtons();
+      this.show();
     } else {
       this.deselectElement();
-      this.hideButtons();
+      this.hide();
     }
   }
 
   // 是否应该显示按钮
-  private shouldDisplayButtonsOnElement(el: any) {
-    const addonClassNames: any = [];
+  private shouldDisplayButtonsOnElement(el: HTMLElement) {
+    const addonClassNames: string[] = [];
     let isAddon = false;
     let belongsToEditor = false;
 
@@ -165,12 +170,12 @@ class ExtensionManager implements IExtensionsManager {
     this.selectedElement = null;
   }
 
-  private showButtons() {
+  private show() {
     this._elem.classList.add(variables.ACTIVE_BUTTONS_CLASS);
     this.positionButtons();
   }
 
-  private hideButtons() {
+  private hide() {
     this._elem.classList.remove(variables.ACTIVE_BUTTONS_CLASS);
     this._elem.classList.remove(variables.ACTIVE_ADDONS_CLASS);
   }

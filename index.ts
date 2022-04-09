@@ -8,6 +8,8 @@ import { createExtensionsManager } from './plugins'
 import './style.css'
 import './plugins/styles/style.css'
 
+const EMPTY_CONTENT = '<p><br></p>'
+
 export default defineComponent({
   name: 'medium-editor',
   /**
@@ -102,7 +104,7 @@ export default defineComponent({
           insert: insertPlugin
         }
       }
-      this.getElement().innerHTML = this.text || ''
+      this.getElement().innerHTML = this.text || EMPTY_CONTENT
       this.editor = new MediumEditor(`#${this.elementID}`, options)
       this.editor.subscribe('editableInput', this.emit)
       this.$emit('editorCreated', this.editor)
