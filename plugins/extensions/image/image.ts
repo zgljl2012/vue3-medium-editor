@@ -29,7 +29,6 @@ export class ImageExtension implements Extension {
   captionListener: any
   imageID: number = 0
 
-  cachedElement: any = null
   cacheImages: any = {}
 
   constructor(plugin: any, options: ImageOptions) {
@@ -134,7 +133,6 @@ export class ImageExtension implements Extension {
   handleClick () {
     // 如果设置了回调，则交给回调处理，只接收回调函数传回的图片 URL
     if (this.options.onClick && typeof this.options.onClick === 'function') {
-      this.cachedElement = this._plugin.selectedElement
       this.options.onClick((imgUrl: any) => {
         this.insertImage(imgUrl, null)
       })
@@ -192,9 +190,6 @@ export class ImageExtension implements Extension {
           el.removeChild(child)
         }
       }
-    }
-    if (!el) {
-      el = this.cachedElement
     }
 
     const imageID = this.nextImageID()
