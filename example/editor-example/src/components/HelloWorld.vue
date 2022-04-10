@@ -24,7 +24,7 @@ export default defineComponent({
   methods: {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     edit (op: {content: string}) {
-      // console.log(op.content)
+      console.log(op.content)
     },
     onClickImage (cb: (url: string) => void) {
       console.log('click image1')

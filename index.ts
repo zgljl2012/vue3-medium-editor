@@ -82,9 +82,10 @@ export default defineComponent({
       return document.getElementById(this.elementID) || { innerHTML: '' }
     },
     emit (event: Event) {
-      this.$emit('edit', { event, editor: this.editor, content: this.editor?.getContent() })
+      this.$emit('edit', { content: this.getElement().innerHTML })
     },
     tearDown () {
+      clearInterval(this.interval)
       window.removeEventListener('keydown', this.onGlobalKeyDown)
       this.editor?.unsubscribe('editableInput', this.emit)
       this.editor?.destroy()
@@ -119,6 +120,17 @@ export default defineComponent({
       this.editor = new MediumEditor(`#${this.elementID}`, options)
       this.editor.subscribe('editableInput', this.emit)
       this.$emit('editorCreated', this.editor)
+
+      // TODO 使用 Proxy 及虚拟 DOM 重写编辑器，否则性能太差，同时难以扩展
+      // 为解决图片插入后无编辑事件发出的问题，采用轮询机制，每 100 ms轮询一次内容是否有变化，直接触发编辑事件
+      let cache = this.getElement().innerHTML
+      this.interval = setInterval(() => {
+        if (cache !== this.getElement().innerHTML) {
+          this.emit(new Event('editableInput'))
+          cache = this.getElement().innerHTML
+        }
+      }, 100)
+
     }
   },
   watch: {

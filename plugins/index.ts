@@ -178,6 +178,8 @@ class ExtensionManager implements IExtensionsManager {
     const name = e.currentTarget.getAttribute(variables.ATTR_DATA_ADDON);
     e.preventDefault();
     this.extensionsMapping[name].handleClick(e);
+    // 切换 addons 状态
+    this.toggleAddons()
   }
 }
 
