@@ -46,7 +46,6 @@ export class ImageExtension implements Extension {
   private preprocess() {
     // 处理 figcaption 错位的问题
     const figcaptions = this._editor.elements[0].getElementsByTagName('figcaption')
-    console.log(figcaptions)
     for(const figcaption of figcaptions) {
       // 删除 figcaption 的 next 元素
       if (figcaption.nextSibling) {
@@ -67,7 +66,6 @@ export class ImageExtension implements Extension {
         p.remove()
       }
     }
-    console.log(this._editor.getContent())
   }
 
   // 处理在图片后面回车的情况
@@ -164,14 +162,31 @@ export class ImageExtension implements Extension {
   private captionHandler (event: any) {
     // 处理 caption 的全选删除
     if (event.key === 'Backspace') {
-      const elem = MediumEditor.selection.getSelectionStart(this._editor.options.ownerDocument)
-      if (elem.tagName.toLowerCase() === 'figcaption') {
+      let elem = MediumEditor.selection.getSelectionStart(this._editor.options.ownerDocument)
+      // 查找最近的 figcaption
+      while (elem && elem.tagName.toLowerCase() !== 'figcaption') {
+        elem = elem.parentNode
+        if (elem.tagName.toLowerCase() === 'div') {
+          return
+        }
+      }
+      if (elem) {
         // 如果 figcaption 中的内容全部删除，则删除 figcaption
         const parentNode = elem.parentNode
+        // case1: 下一行无内容
         if (elem.innerHTML === '<br>') {
           parentNode.removeChild(elem)
+          utils.moveToNext(parentNode)
+        } else {
+          // case2: 下一行有内容，此时，会把下一行的元素提到 figcaption 中
+          // 创建下一行的 p，将 figcaption 中的内容移到下一行的 p 中，然后删除 figcaption
+          if (elem.childNodes[0].getAttribute('data-image-id') === null) {
+            const next = document.createElement('p')
+            next.appendChild(elem.childNodes[0])
+            parentNode.parentNode.insertBefore(next, parentNode.nextSibling)
+            parentNode.removeChild(elem)
+          }
         }
-        utils.moveToNext(parentNode)
       }
     }
     if (event.keyCode === 13) {

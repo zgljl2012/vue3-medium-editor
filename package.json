@@ -1,6 +1,6 @@
 {
   "name": "vue3-medium-editor",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "A medium editor for vue 3.x",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -32,7 +32,7 @@
   "dependencies": {
     "@babel/types": "^7.17.0",
     "@fortawesome/fontawesome-free": "^6.1.1",
-    "medium-editor-x": "0.0.3",
+    "medium-editor-x": "0.0.4",
     "vue": "^3.0.0-rc.1"
   }
 }
