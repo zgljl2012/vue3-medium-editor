@@ -1,3 +1,4 @@
+const output = false
 
 export function logger(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
   const original = descriptor.value;
@@ -17,7 +18,9 @@ export function timer(target: any, propertyKey: string, descriptor: PropertyDesc
     const start_at = performance.now()
     const result = original.call(this, ...args);
     const end_at = performance.now()
-    console.log(`${propertyKey}: ${end_at - start_at}ms`)
+    if (output) {
+      console.log(`${propertyKey}: ${end_at - start_at}ms`)
+    }
     return result;
   }
 }
