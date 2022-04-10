@@ -2,6 +2,7 @@ import { Extension } from '../../types'
 import utils from '../../utils'
 import { Toolbar } from './toolbar'
 import * as MediumEditor from 'medium-editor-x'
+import { delay } from '../../decorator'
 
 const captionClassName: string = 'medium-editor-insert-image-caption'
 const elementClassName: string = 'medium-editor-insert-images'
@@ -39,12 +40,13 @@ export class ImageExtension implements Extension {
     // listen for editing figcaptions
     this._plugin.on(document, 'keyup', this.captionHandler.bind(this))
 
-    // TODO 预处理当前编辑器中的内容
+    // 预处理当前编辑器中的内容
     this.preprocess()
   }
 
+  @delay(300)
   private preprocess() {
-    // 处理 figcaption 错位的问题
+    // 处理 figcaption 错位的问题，延时执行，解决初始化时文本尚未渲染完成的问题
     const figcaptions = this._editor.elements[0].getElementsByTagName('figcaption')
     for(const figcaption of figcaptions) {
       // 删除 figcaption 的 next 元素

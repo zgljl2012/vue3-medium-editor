@@ -21,3 +21,16 @@ export function timer(target: any, propertyKey: string, descriptor: PropertyDesc
     return result;
   }
 }
+
+// Delay function, only support no-return functions now
+// Default delay 200 ms
+export function delay (ms: number = 200) {
+  return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
+    const original = descriptor.value;
+    descriptor.value = function (...args) {
+      setTimeout(() => {
+        original.call(this, ...args)
+      }, ms)
+    }
+  }
+}
