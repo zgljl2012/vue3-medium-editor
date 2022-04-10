@@ -1,5 +1,6 @@
 <template>
   <div class="editor" style="margin-left: 25%; margin-right: 25%;">
+    <input placeholder="input test">
     <editor :text="text" @edit='edit' :onClickImage="onClickImage" />
   </div>
 </template>

@@ -92,7 +92,10 @@ export default defineComponent({
     },
     onGlobalKeyDown(e: KeyboardEvent) {
       // 解决全局无内容时，还按删除键的问题
-      if (e.key === 'Backspace' && this.editor && this.editor?.getContent() === EMPTY_CONTENT) {
+      if (e.key === 'Backspace' && e.target === this.getElement()
+        && this.editor && this.editor?.getContent() === EMPTY_CONTENT) {
+        // 判断当前元素
+        console.log(e)
         e.preventDefault()
       }
     },
