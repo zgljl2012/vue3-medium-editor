@@ -1,4 +1,4 @@
-import { Extension } from '../../types'
+import { Extension, AbstractExtension, MediumEditorAdaptor } from '../../types'
 import utils from '../../utils'
 import { Toolbar } from './toolbar'
 import * as MediumEditor from 'medium-editor-x'
@@ -11,7 +11,7 @@ export interface ImageOptions {
   onClick(cb: (url: string) => void)
 }
 
-export class ImageExtension implements Extension {
+export class ImageExtension extends AbstractExtension {
   // options: ImageOptions
   name: string = 'image'
   label: string = '<span class="fa fa-camera"></span>'
@@ -23,19 +23,22 @@ export class ImageExtension implements Extension {
   _plugin: any
   _editor: any
   elementClassName: string = elementClassName
+  activeClassName: string = activeClassName
 
   toolbar: any
   imageID: number = 0
   cacheImages: object = {}
 
   constructor(plugin: any, options: ImageOptions) {
+    // Create an adaptor
+    super(new MediumEditorAdaptor(plugin))
+
     Object.assign(this.options, options)
 
     this._plugin = plugin
     this._editor = this._plugin.base
 
     this.initToolbar()
-    this.events()
 
     // listen for editing figcaptions
     this._plugin.on(document, 'keyup', this.captionHandler.bind(this))
@@ -212,19 +215,11 @@ export class ImageExtension implements Extension {
     return `${this.imageID++}`
   }
 
-  private events () {
-    this._plugin.on(document, 'click', this.unselect.bind(this))
-
-    this._plugin.getEditorElements().forEach((editor: any) => {
-      this._plugin.on(editor, 'click', this.select.bind(this))
-    })
-  }
-
   handleClick () {
     // 如果设置了回调，则交给回调处理，只接收回调函数传回的图片 URL
     if (this.options.onClick && typeof this.options.onClick === 'function') {
       this.options.onClick((imgUrl: any) => {
-        this.render(imgUrl)
+        this.render({url: imgUrl})
       })
       return
     }
@@ -263,25 +258,8 @@ export class ImageExtension implements Extension {
     this._editor.extensions.push(this.toolbar)
   }
 
-  private render (url: any) {
-    let el = this._editor.getSelectedParentElement();
-    // 需 el 的父元素是 div[class="medium-editor-element"]，el 本身为 <p>，即一级段落
-    if (el) {
-      while (!el.parentNode.classList.contains('medium-editor-element')) {
-        const current = el
-        el = el.parentNode
-        el.removeChild(current)
-      }
-      // 删除 el 中的 <br>
-      const children = el.childNodes
-      for (const i in children) {
-        const child = children[i]
-        if (child.nodeName === 'BR') {
-          el.removeChild(child)
-        }
-      }
-    }
-
+  protected render ({url}: {url: string}) {
+    let el = this.getCurrentNode()
     const imageID = this.nextImageID()
     const img = document.createElement('img')
     img.setAttribute('data-image-id', `${imageID}`)
@@ -315,43 +293,7 @@ export class ImageExtension implements Extension {
       domImage.src = url
     }
     el.classList.add(elementClassName)
-    el.contenteditable = false
-    // Return domImage so we can test this function easily (just for testing)
-    return domImage
-  }
-
-  private select (e: any) {
-    const el = e.target
-
-    if (
-      el.nodeName.toLowerCase() === 'img'
-      // && this.getClosestWithClassName(el, this.elementClassName)
-    ) {
-      el.classList.add(activeClassName)
-      this._editor.selectElement(el)
-    }
-  }
-
-  private unselect (e: any) {
-    const el = e.target
-    let clickedImage: any
-
-    // Unselect all selected images. If an image is clicked, unselect all except this one.
-    if (
-      el.nodeName.toLowerCase() === 'img' &&
-      el.classList.contains(activeClassName)
-    ) {
-      clickedImage = el
-    }
-
-    const images = utils.getElementsByClassName(
-      this._plugin.getEditorElements(),
-      activeClassName
-    )
-    Array.prototype.forEach.call(images, image => {
-      if (image !== clickedImage) {
-        image.classList.remove(activeClassName)
-      }
-    })
+    el.setAttribute('contenteditable', 'false')
+    return el
   }
 }
