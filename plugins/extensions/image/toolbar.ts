@@ -1,5 +1,6 @@
 import { getToolbarButton } from "./tool-buttons"
 import * as MediumEditor from "medium-editor-x"
+import * as utils from '../../utils'
 
 const activeClassName = 'medium-editor-insert-image-active'
 
@@ -38,20 +39,6 @@ export class Toolbar extends MediumEditor.extensions.toolbar {
     this.base = options.plugin.base
 
     this.init()
-  }
-
-  getElementsByClassName (parents: any, className: any) {
-    const results: any = []
-
-    Array.prototype.forEach.call(parents, editor => {
-      const elements = editor.getElementsByClassName(className)
-
-      Array.prototype.forEach.call(elements, element => {
-        results.push(element)
-      })
-    })
-
-    return results
   }
 
   createToolbar () {
@@ -137,7 +124,7 @@ export class Toolbar extends MediumEditor.extensions.toolbar {
 
     // Wait for elements to be selected
     setTimeout(() => {
-      activeElements = this.getElementsByClassName(
+      activeElements = utils.getElementsByClassName(
         this.getEditorElements(),
         activeClassName
       )
@@ -153,7 +140,7 @@ export class Toolbar extends MediumEditor.extensions.toolbar {
   }
 
   setToolbarPosition () {
-    const container = this.getElementsByClassName(
+    const container = utils.getElementsByClassName(
       this.getEditorElements(),
       activeClassName
     )[0]

@@ -293,7 +293,7 @@ export class ImageExtension extends AbstractExtension {
       domImage.src = url
     }
     el.classList.add(elementClassName)
-    el.setAttribute('contenteditable', 'false')
+    // el.setAttribute('contenteditable', 'false')
     return el
   }
 }

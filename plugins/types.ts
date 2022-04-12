@@ -105,6 +105,7 @@ export abstract class AbstractExtension {
   private select (e: Event) {
     const el = <HTMLElement>e.target
     if (el.classList.contains(this.elementClassName) ||
+      el.previousSibling === null &&
       (<HTMLElement>el.parentNode).classList.contains(this.elementClassName)) {
       el.classList.add(this.activeClassName)
       this.editor.selectElement(el)
