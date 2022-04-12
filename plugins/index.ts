@@ -1,6 +1,7 @@
 import * as MediumEditor from "medium-editor-x";
 import { Extension, IExtensionsManager } from "./types";
 import { ImageOptions, ImageExtension } from "./extensions/image/image";
+import { VideoExtension } from "./extensions/video";
 import * as utils from './utils'
 import variables from './variables'
 import ExtensionsHtmlRender from './builder'
@@ -196,9 +197,11 @@ export const createExtensionsManager = ({ imageOptions }: {imageOptions: ImageOp
 
       // init extensions
       const imageExtension = new ImageExtension(this, imageOptions);
+      const videoExtension = new VideoExtension()
 
       // add extensions
       this.extensionsManager.addExtension(imageExtension);
+      this.extensionsManager.addExtension(videoExtension);
 
       // render
       this.extensionsManager.render();
