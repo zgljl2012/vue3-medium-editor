@@ -76,10 +76,6 @@ a {
 
 ```bash
 
-cd example/editor-example
-
-yarn
-
 yarn serve
 
 ```

@@ -2,12 +2,14 @@
   "name": "vue3-medium-editor",
   "version": "0.0.8",
   "description": "A medium editor for vue 3.x",
+  "source": "dist/index.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "dev": "yarn sync && cd example/editor-example && yarn serve",
-    "sync": "npm run compile && scripts/sync",
-    "compile": "tsc && cp style.css dist/ && mkdir -p dist/plugins/styles/ && cp -r plugins/styles/*.css dist/plugins/styles/",
+    "serve": "yarn example serve",
+    "example": "yarn --cwd example",
+    "compile": "tsc",
+    "watch": "tsc --watch",
     "test": "echo \"Error: no test specified\" && exit 1",
     "cloc": "gocloc index.ts style.css plugins"
   },

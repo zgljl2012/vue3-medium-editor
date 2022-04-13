@@ -18,6 +18,9 @@
     "paths": {
       "@/*": [
         "src/*"
+      ],
+      "vue3-medium-editor": [
+        ".."
       ]
     },
     "lib": [

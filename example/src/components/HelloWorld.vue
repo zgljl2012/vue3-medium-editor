@@ -4,7 +4,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="js">
 import { defineComponent } from 'vue'
 import editor from 'vue3-medium-editor'
 
@@ -23,10 +23,10 @@ export default defineComponent({
   },
   methods: {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    edit (op: {content: string}) {
+    edit (op) {
       // console.log(op.content)
     },
-    onClickImage (cb: (url: string) => void) {
+    onClickImage (cb) {
       console.log('click image1')
       // eslint-disable-next-line node/no-callback-literal
       cb('https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png')
