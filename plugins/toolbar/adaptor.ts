@@ -2,59 +2,70 @@ import * as MediumEditor from "medium-editor-x"
 import * as utils from '../utils'
 import { Editor, SelectionToolbar, ToolbarOptions, ToolbarButton } from '../types'
 
-const activeClassName = 'medium-editor-insert-image-active'
+export interface ToolbarButtonAdaptorOptions {
+  editor: Editor
+  btn: ToolbarButton
+  activeClassName: string
+}
 
-const captionClassName = 'medium-editor-insert-image-caption'
+export class ToolbarButtonAdaptor implements ToolbarButton {
+  name: string
+  label: string
+  onClick?: (extensionElem: HTMLElement) => void
 
-export const getToolbarButton = (MediumEditor: any) => {
-  const ToolbarButton = MediumEditor.extensions.button.extend({
-    init: function () {
-      this.button = this.document.createElement('button')
-      this.button.classList.add('medium-editor-action')
-      this.button.innerHTML = `<b>${this.label}</b>`
+  /**
+   * @Deprecated this field will be removed in next major version
+   */
+  private mediumEditorButton: any
+  private editor: Editor
 
-      this.on(this.button, 'click', this.handleClick.bind(this))
-    },
+  constructor(options: ToolbarButtonAdaptorOptions) {
+    this.name = options.btn.name
+    this.label = options.btn.label
+    this.onClick = options.btn.onClick.bind(options.btn)
+    this.editor = options.editor
 
-    getButton: function () {
-      return this.button
-    },
+    const mediumEditorButtonClass = MediumEditor.extensions.button.extend({
+      init: function () {
+        this.button = this.document.createElement('button')
+        this.button.classList.add('medium-editor-action')
+        this.button.innerHTML = `<b>${this.label}</b>`
 
-    handleClick: function () {
-      const el = this.document.querySelector('.medium-editor-insert-image-active')
-      if (this.name === 'align-center') {
-        el.parentNode.style['text-align'] = 'center'
+        this.on(this.button, 'click', this.handleClick.bind(this))
+      },
+
+      getButton: function () {
+        return this.button
+      },
+
+      handleClick: function () {
+        const el = this.document.querySelector(`.${this.activeClassName}`)
+        this.onClick(el)
+        el.classList.remove(this.activeClassName)
+        this.base.checkContentChanged()
       }
-      if (this.name === 'align-left') {
-        el.parentNode.style['text-align'] = 'left'
-      }
-      if (this.name === 'align-right') {
-        el.parentNode.style['text-align'] = 'right'
-      }
-      if (this.name === 'caption') {
-        // 判断是否已存在 caption
-        const caption = el.nextSibling
-        if (!caption) {
-          const caption = this.document.createElement('figcaption')
-          const imageID = el.getAttribute('data-image-id')
-          caption.setAttribute('data-image-id', imageID)
-          caption.innerHTML = `<span data-image-id='${imageID}' class="${captionClassName}">请输入图片描述</span>`
-          el.parentNode.appendChild(caption)
-        } else {
-          // move cursor
-          let child = caption.firstChild
-          if (child.tagName.toLowerCase() === 'font') {
-            child = child.firstChild
-          }
-          MediumEditor.selection.moveCursor(this.document, child, child.childNodes.length)
+    })
+    this.mediumEditorButton = new mediumEditorButtonClass(Object.assign(
+        {},
+        {
+          window: this.editor.window,
+          document: this.editor.document,
+          base: this.editor.base
+        },
+        {
+          name: this.name,
+          label: this.label,
+          onClick: this.onClick,
+          activeClassName: options.activeClassName
         }
-      }
-      el.classList.remove('medium-editor-insert-image-active')
-      this.base.checkContentChanged()
-    }
-  })
+    ))
+    this.mediumEditorButton.init()
+  }
 
-  return ToolbarButton
+  getButton() {
+    return this.mediumEditorButton
+  }
+
 }
 
 export class MediumEditorToolbar extends MediumEditor.extensions.toolbar {
@@ -64,29 +75,24 @@ export class MediumEditorToolbar extends MediumEditor.extensions.toolbar {
   document: any
   base: any
   type: string = 'image'
+  activeClassName: string
   constructor (options: ToolbarOptions) {
     super(options)
     this.window = options.editor.window
     this.document = options.editor.document
     this.base = options.editor.base
     this.name = `${options.type}Toolbar`
+    this.activeClassName = options.activeClassName
 
-    options.buttons.forEach((buttonOptions: any) => {
-      const ToolbarButton = getToolbarButton(MediumEditor)
-      const button = new ToolbarButton(
-        Object.assign(
-          {},
-          {
-            window: this.window,
-            document: this.document,
-            base: this.base
-          },
-          buttonOptions
-        )
-      )
+    options.buttons.forEach((buttonOptions: ToolbarButton) => {
+      const button = new ToolbarButtonAdaptor({
+        editor: options.editor,
+        btn: buttonOptions,
+        activeClassName: this.activeClassName
+      })
 
-      button.init()
-      this.editor.base.extensions.push(button)
+      // button.getButton().init()
+      options.editor.base.extensions.push(button.getButton())
     })
 
     this.init()
@@ -177,7 +183,7 @@ export class MediumEditorToolbar extends MediumEditor.extensions.toolbar {
     setTimeout(() => {
       activeElements = utils.getElementsByClassName(
         this.getEditorElements(),
-        activeClassName
+        this.activeClassName
       )
 
       // Hide toolbar when no elements are selected
@@ -193,7 +199,7 @@ export class MediumEditorToolbar extends MediumEditor.extensions.toolbar {
   setToolbarPosition () {
     const container = utils.getElementsByClassName(
       this.getEditorElements(),
-      activeClassName
+      this.activeClassName
     )[0]
 
     // If there isn't a valid selection, bail
@@ -219,5 +225,4 @@ export class MediumEditorToolbarAdaptor extends MediumEditorToolbar implements S
   addButtons(buttons: ToolbarButton[]): SelectionToolbar {
     throw new Error("Method not implemented.")
   }
-
 }

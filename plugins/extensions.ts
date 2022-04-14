@@ -13,6 +13,14 @@ export abstract class AbstractExtension {
 
   constructor(editor: Editor) {
     this.editor = editor
+  }
+
+  /**
+   * @Deprecated 因为 typescript 强制要求 super 在构造函数前面，但某些函数，如 initToolbar 需用到子类的属性
+   * 调用时，子类尚未初始化，故无法调用子类的属性
+   * 故提供 init 函数，交由子类调用，未来有更好的方法后，此模式会删除
+   */
+  protected init() {
     // bind events
     this.bindEvents()
     // init toolbar

@@ -3,6 +3,8 @@ import { AbstractExtension } from '../../extensions'
 import utils from '../../utils'
 import * as MediumEditor from 'medium-editor-x'
 import { delay } from '../../decorator'
+import { AlignCenterButton, AlignLeftButton, AlignRightButton } from '../../toolbar'
+import { AddFigcaptionButton } from './add-figcaption'
 
 export interface ImageOptions {
   onClick(cb: (url: string) => void)
@@ -29,8 +31,9 @@ export class ImageExtension extends AbstractExtension {
   constructor(plugin: any, options: ImageOptions) {
     // Create an adaptor
     super(new MediumEditorAdaptor(plugin))
-
     Object.assign(this.options, options)
+
+    this.init()
 
     this._plugin = plugin
     this._editor = this._plugin.base
@@ -222,26 +225,18 @@ export class ImageExtension extends AbstractExtension {
   }
 
   public toolbar(): ToolbarOptions {
+    const btn = new AddFigcaptionButton({
+      document: this.editor.document,
+      captionClassName: this.captionClassName,
+    })
     return {
       type: 'images',
       activeClassName: this.activeClassName,
       buttons: [
-        {
-          name: 'align-left',
-          label: 'Left'
-        },
-        {
-          name: 'align-center',
-          label: 'Center'
-        },
-        {
-          name: 'align-right',
-          label: 'Right'
-        },
-        {
-          name: 'caption',
-          label: 'Add Caption'
-        }
+        new AlignLeftButton(),
+        new AlignCenterButton(),
+        new AlignRightButton(),
+        btn
       ]
     }
   }

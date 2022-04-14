@@ -132,10 +132,10 @@ magic-string@^0.25.7:
   dependencies:
     sourcemap-codec "^1.4.8"
 
-medium-editor-x@0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/medium-editor-x/-/medium-editor-x-0.0.4.tgz#35f356905140f19cc519399d95cdd645e7ee28c9"
-  integrity sha512-SjKaib3OGp2aFzf+QxqA3p0t9msbsmyXo2MVOWF0PQKegk9KOfqVT/iFYKsYZdpzYsQ/fO1LaLbiTR2gBmpK6Q==
+medium-editor-x@0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/medium-editor-x/-/medium-editor-x-0.0.5.tgz#e92d6dad06a8d4cf2ead9c93c4427b158a2c6ac2"
+  integrity sha512-23j3eDPI729nDathQrC44Ju+s/PQZrfNGUMVjdvTgsBpv4ZrOn5QvDAZv2+QxhDckvzWZxWMCDLcofhqc4wAtQ==
 
 nanoid@^3.3.1:
   version "3.3.2"

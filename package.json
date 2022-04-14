@@ -8,7 +8,7 @@
   "scripts": {
     "serve": "yarn example serve",
     "example": "yarn --cwd example",
-    "compile": "tsc",
+    "compile": "tsc && cp style.css dist/style.css && cp -r plugins/styles dist/plugins/styles",
     "watch": "tsc --watch",
     "test": "echo \"Error: no test specified\" && exit 1",
     "cloc": "gocloc index.ts style.css plugins"
@@ -34,7 +34,7 @@
   "dependencies": {
     "@babel/types": "^7.17.0",
     "@fortawesome/fontawesome-free": "^6.1.1",
-    "medium-editor-x": "0.0.4",
+    "medium-editor-x": "0.0.5",
     "vue": "^3.0.0-rc.1"
   }
 }
