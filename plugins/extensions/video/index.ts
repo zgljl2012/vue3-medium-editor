@@ -1,4 +1,4 @@
-import { Extension, ToolbarOptions, SelectionToolbarButton } from '../../types'
+import { Extension, ToolbarOptions } from '../../types'
 
 export class VideoExtension implements Extension {
   name: string = 'video';

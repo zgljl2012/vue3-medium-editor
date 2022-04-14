@@ -1,4 +1,4 @@
-import { Editor, SelectionToolbar, ToolbarOptions } from "./types"
+import { Editor, ToolbarOptions } from "./types"
 import * as utils from './utils'
 import { MediumEditorToolbarAdaptor } from "./toolbar"
 

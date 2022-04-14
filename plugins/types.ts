@@ -1,16 +1,16 @@
 import * as utils from './utils'
 
 // Button of the selection's toolbar
-export interface SelectionToolbarButton {
+export interface ToolbarButton {
   name: string
   label: string
-  onClick(e: Event): void
+  onClick?: (extensionElem: HTMLElement) => void
 }
 
 // Toolbar of selection
 export interface SelectionToolbar {
-  addButton(button: SelectionToolbarButton): SelectionToolbar
-  addButtons(buttons: SelectionToolbarButton[]): SelectionToolbar
+  addButton(button: ToolbarButton): SelectionToolbar
+  addButtons(buttons: ToolbarButton[]): SelectionToolbar
 }
 
 // 自定义编辑器接口，用于替代 medium-editor
@@ -35,10 +35,7 @@ export interface ToolbarOptions {
   editor?: Editor,
   type: string,
   activeClassName: string,
-  buttons: {
-    name: string
-    label: string
-  }[]
+  buttons: ToolbarButton[]
 }
 
 export interface Extension {

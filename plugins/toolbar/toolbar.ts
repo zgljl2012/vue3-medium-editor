@@ -1,6 +1,6 @@
 import * as MediumEditor from "medium-editor-x"
-import * as utils from './utils'
-import { Editor, SelectionToolbar, SelectionToolbarButton, ToolbarOptions } from './types'
+import * as utils from '../utils'
+import { Editor, SelectionToolbar, ToolbarOptions, ToolbarButton } from '../types'
 
 const activeClassName = 'medium-editor-insert-image-active'
 
@@ -90,13 +90,6 @@ export class MediumEditorToolbar extends MediumEditor.extensions.toolbar {
     })
 
     this.init()
-  }
-
-  addButton(button: SelectionToolbarButton): SelectionToolbar {
-    throw new Error("Method not implemented.")
-  }
-  addButtons(buttons: SelectionToolbarButton[]): SelectionToolbar {
-    throw new Error("Method not implemented.")
   }
 
   createToolbar () {
@@ -220,10 +213,10 @@ export class MediumEditorToolbar extends MediumEditor.extensions.toolbar {
 }
 
 export class MediumEditorToolbarAdaptor extends MediumEditorToolbar implements SelectionToolbar {
-  addButton(button: SelectionToolbarButton): SelectionToolbar {
+  addButton(button: ToolbarButton): SelectionToolbar {
     throw new Error("Method not implemented.")
   }
-  addButtons(buttons: SelectionToolbarButton[]): SelectionToolbar {
+  addButtons(buttons: ToolbarButton[]): SelectionToolbar {
     throw new Error("Method not implemented.")
   }
 
