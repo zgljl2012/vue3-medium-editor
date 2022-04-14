@@ -1,6 +1,7 @@
-import { Extension, AbstractExtension, MediumEditorAdaptor } from '../../types'
+import { Extension, MediumEditorAdaptor, SelectionToolbar, ToolbarOptions } from '../../types'
+import { AbstractExtension } from '../../extensions'
 import utils from '../../utils'
-import { Toolbar } from './toolbar'
+import { MediumEditorToolbar, MediumEditorToolbarAdaptor } from '../../toolbar'
 import * as MediumEditor from 'medium-editor-x'
 import { delay } from '../../decorator'
 
@@ -25,7 +26,6 @@ export class ImageExtension extends AbstractExtension {
   elementClassName: string = elementClassName
   activeClassName: string = activeClassName
 
-  toolbar: any
   imageID: number = 0
   cacheImages: object = {}
 
@@ -37,8 +37,6 @@ export class ImageExtension extends AbstractExtension {
 
     this._plugin = plugin
     this._editor = this._plugin.base
-
-    this.initToolbar()
 
     // listen for editing figcaptions
     this._plugin.on(document, 'keyup', this.captionHandler.bind(this))
@@ -226,9 +224,8 @@ export class ImageExtension extends AbstractExtension {
     // TODO 支持图片上传
   }
 
-  private initToolbar () {
-    this.toolbar = new Toolbar({
-      plugin: this._plugin,
+  public toolbar(): ToolbarOptions {
+    return {
       type: 'images',
       activeClassName: activeClassName,
       buttons: [
@@ -253,9 +250,7 @@ export class ImageExtension extends AbstractExtension {
           label: 'Add Caption'
         }
       ]
-    })
-
-    this._editor.extensions.push(this.toolbar)
+    }
   }
 
   protected render ({url}: {url: string}) {

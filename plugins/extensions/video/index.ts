@@ -1,4 +1,4 @@
-import { Extension } from '../../types'
+import { Extension, ToolbarOptions, SelectionToolbarButton } from '../../types'
 
 export class VideoExtension implements Extension {
   name: string = 'video';
@@ -10,5 +10,9 @@ export class VideoExtension implements Extension {
 
   handleClick(e: Event) {
     console.log('VideoExtension.handleClick()')
+  }
+
+  toolbar(): ToolbarOptions | null {
+    return null
   }
 }

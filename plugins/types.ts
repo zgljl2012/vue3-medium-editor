@@ -1,10 +1,53 @@
 import * as utils from './utils'
 
+// Button of the selection's toolbar
+export interface SelectionToolbarButton {
+  name: string
+  label: string
+  onClick(e: Event): void
+}
+
+// Toolbar of selection
+export interface SelectionToolbar {
+  addButton(button: SelectionToolbarButton): SelectionToolbar
+  addButtons(buttons: SelectionToolbarButton[]): SelectionToolbar
+}
+
+// 自定义编辑器接口，用于替代 medium-editor
+// 需为 medium-editor 编写一个与此接口的适配器
+export interface Editor {
+  window: Window
+  document: Document
+  /**
+   * @deprecated 仅用于当前兼容 medium-editor 的 toolbar，未来会删除
+   */
+  base: any
+  getEditorElements(): any
+  selectElement(el: HTMLElement): void
+  getSelectedParentElement(): HTMLElement
+  setDefaultSelectionToolbar(toolbar: SelectionToolbar): Editor
+  getDefaultSelectionToolbar(): SelectionToolbar
+  registerSelectionToolbar(toolbar: SelectionToolbar): Editor
+  on(dom: HTMLElement | Document, event: string, callback: (e: Event) => {}): Editor
+}
+
+export interface ToolbarOptions {
+  editor?: Editor,
+  type: string,
+  activeClassName: string,
+  buttons: {
+    name: string
+    action: string
+    label: string
+  }[]
+}
+
 export interface Extension {
   name: string
   label: string
   elementClassName: string
   handleClick(e: Event)
+  toolbar(): ToolbarOptions | null
 }
 
 export interface ExtensionsHtmlRenderOptions {
@@ -24,23 +67,25 @@ export interface IExtensionsManager {
   render()
 }
 
-// 自定义编辑器接口，用于替代 medium-editor
-// 需为 medium-editor 编写一个与此接口的适配器
-export interface Editor {
-  getEditorElements(): any
-  selectElement(el: HTMLElement): void
-  getSelectedParentElement(): HTMLElement
-  on(dom: HTMLElement | Document, event: string, callback: (e: Event) => {})
-}
-
 // Medium-editor 适配器
 export class MediumEditorAdaptor implements Editor {
   _plugin: any
   _editor: any
+  // 此默认工具栏暂时没用，只是用于抽象编辑器设计，目前只有扩展的工具栏有用
+  defaultSelectionToolbar: SelectionToolbar
+  window: Window
+  document: Document
+  /**
+   * @deprecated 仅用于当前兼容 medium-editor 的 toolbar，未来会删除
+   */
+  base: any
 
   constructor(plugin: any) {
     this._plugin = plugin
     this._editor = plugin.base
+    this.window = plugin.window
+    this.document = plugin.document
+    this.base = plugin.base
   }
 
   getEditorElements(): HTMLElement {
@@ -55,78 +100,22 @@ export class MediumEditorAdaptor implements Editor {
     return this._editor.getSelectedParentElement()
   }
 
-  on(dom: HTMLElement | Document, event: string, callback: (e: Event) => {}) {
+  on(dom: HTMLElement | Document, event: string, callback: (e: Event) => {}): Editor {
     this._plugin.on(dom, event, callback)
-  }
-}
-
-export abstract class AbstractExtension {
-  abstract name: string
-  abstract label: string
-  abstract elementClassName: string
-  abstract activeClassName: string
-
-  protected editor: Editor
-
-  constructor(editor: Editor) {
-    this.editor = editor
-    // bind events
-    this.bindEvents()
+    return this
   }
 
-  private bindEvents() {
-    this.editor.on(document, 'click', this.unselect.bind(this))
-    this.editor.getEditorElements().forEach((editor: any) => {
-      this.editor.on(editor, 'click', this.select.bind(this))
-    })
+  setDefaultSelectionToolbar(toolbar: SelectionToolbar): Editor {
+    this.defaultSelectionToolbar = toolbar
+    return this
   }
 
-  protected getCurrentNode(): HTMLElement {
-    let el = this.editor.getSelectedParentElement();
-    // 需 el 的父元素是 div[class="medium-editor-element"]，el 本身为 <p>，即一级段落
-    if (el) {
-      while (!(<HTMLElement>el.parentNode).classList.contains('medium-editor-element')) {
-        const current = el
-        el = <HTMLElement>el.parentNode
-        el.removeChild(current)
-      }
-      // 删除 el 中的 <br>
-      const children = el.childNodes
-      for (const i in children) {
-        const child = children[i]
-        if (child.nodeName === 'BR') {
-          el.removeChild(child)
-        }
-      }
-    }
-    return el
+  getDefaultSelectionToolbar(): SelectionToolbar {
+    return this.defaultSelectionToolbar
   }
 
-  private select (e: Event) {
-    const el = <HTMLElement>e.target
-    if (el.classList.contains(this.elementClassName) ||
-      el.previousSibling === null &&
-      (<HTMLElement>el.parentNode).classList.contains(this.elementClassName)) {
-      el.classList.add(this.activeClassName)
-      this.editor.selectElement(el)
-    }
+  registerSelectionToolbar(toolbar: SelectionToolbar): Editor {
+    this._editor.extensions.push(toolbar)
+    return this
   }
-
-  private unselect (e: Event) {
-    // Unselect all selected nodes. If a node is clicked, unselect all except this one.
-    const current: HTMLElement = <HTMLElement>e.target
-    const el = current.classList.contains(this.activeClassName) ? current : null
-    const nodes = utils.getElementsByClassName(
-      this.editor.getEditorElements(),
-      this.activeClassName
-    )
-    Array.prototype.forEach.call(nodes, node => {
-      if (node !== el) {
-        node.classList.remove(this.activeClassName)
-      }
-    })
-  }
-
-  public abstract handleClick(e: Event)
-  protected abstract render(options: any): HTMLElement
 }

@@ -1,19 +1,74 @@
-import { getToolbarButton } from "./tool-buttons"
 import * as MediumEditor from "medium-editor-x"
-import * as utils from '../../utils'
+import * as utils from './utils'
+import { Editor, SelectionToolbar, SelectionToolbarButton, ToolbarOptions } from './types'
 
 const activeClassName = 'medium-editor-insert-image-active'
 
-export class Toolbar extends MediumEditor.extensions.toolbar {
+const captionClassName = 'medium-editor-insert-image-caption'
+
+export const getToolbarButton = (MediumEditor: any) => {
+  const ToolbarButton = MediumEditor.extensions.button.extend({
+    init: function () {
+      this.button = this.document.createElement('button')
+      this.button.classList.add('medium-editor-action')
+      this.button.innerHTML = `<b>${this.label}</b>`
+
+      this.on(this.button, 'click', this.handleClick.bind(this))
+    },
+
+    getButton: function () {
+      return this.button
+    },
+
+    handleClick: function () {
+      const el = this.document.querySelector('.medium-editor-insert-image-active')
+      if (this.name === 'align-center') {
+        el.parentNode.style['text-align'] = 'center'
+      }
+      if (this.name === 'align-left') {
+        el.parentNode.style['text-align'] = 'left'
+      }
+      if (this.name === 'align-right') {
+        el.parentNode.style['text-align'] = 'right'
+      }
+      if (this.name === 'caption') {
+        // 判断是否已存在 caption
+        const caption = el.nextSibling
+        if (!caption) {
+          const caption = this.document.createElement('figcaption')
+          const imageID = el.getAttribute('data-image-id')
+          caption.setAttribute('data-image-id', imageID)
+          caption.innerHTML = `<span data-image-id='${imageID}' class="${captionClassName}">请输入图片描述</span>`
+          el.parentNode.appendChild(caption)
+        } else {
+          // move cursor
+          let child = caption.firstChild
+          if (child.tagName.toLowerCase() === 'font') {
+            child = child.firstChild
+          }
+          MediumEditor.selection.moveCursor(this.document, child, child.childNodes.length)
+        }
+      }
+      el.classList.remove('medium-editor-insert-image-active')
+      this.base.checkContentChanged()
+    }
+  })
+
+  return ToolbarButton
+}
+
+export class MediumEditorToolbar extends MediumEditor.extensions.toolbar {
   name: string
-  plugin: any
+  editor: Editor
   window: any
   document: any
   base: any
   type: string = 'image'
-  constructor (options: any) {
+  constructor (options: ToolbarOptions) {
     super(options)
-
+    this.window = options.editor.window
+    this.document = options.editor.document
+    this.base = options.editor.base
     this.name = `${options.type}Toolbar`
 
     options.buttons.forEach((buttonOptions: any) => {
@@ -22,23 +77,26 @@ export class Toolbar extends MediumEditor.extensions.toolbar {
         Object.assign(
           {},
           {
-            window: this.plugin.window,
-            document: this.plugin.document,
-            base: this.plugin.base
+            window: this.window,
+            document: this.document,
+            base: this.base
           },
           buttonOptions
         )
       )
 
       button.init()
-      this.plugin.base.extensions.push(button)
+      this.editor.base.extensions.push(button)
     })
 
-    this.window = options.plugin.window
-    this.document = options.plugin.document
-    this.base = options.plugin.base
-
     this.init()
+  }
+
+  addButton(button: SelectionToolbarButton): SelectionToolbar {
+    throw new Error("Method not implemented.")
+  }
+  addButtons(buttons: SelectionToolbarButton[]): SelectionToolbar {
+    throw new Error("Method not implemented.")
   }
 
   createToolbar () {
@@ -159,4 +217,14 @@ export class Toolbar extends MediumEditor.extensions.toolbar {
       anchorPreview.hidePreview()
     }
   }
+}
+
+export class MediumEditorToolbarAdaptor extends MediumEditorToolbar implements SelectionToolbar {
+  addButton(button: SelectionToolbarButton): SelectionToolbar {
+    throw new Error("Method not implemented.")
+  }
+  addButtons(buttons: SelectionToolbarButton[]): SelectionToolbar {
+    throw new Error("Method not implemented.")
+  }
+
 }
