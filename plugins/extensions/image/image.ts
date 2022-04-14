@@ -1,13 +1,9 @@
-import { Extension, MediumEditorAdaptor, SelectionToolbar, ToolbarOptions } from '../../types'
+import { MediumEditorAdaptor, ToolbarOptions } from '../../types'
 import { AbstractExtension } from '../../extensions'
 import utils from '../../utils'
-import { MediumEditorToolbar, MediumEditorToolbarAdaptor } from '../../toolbar'
 import * as MediumEditor from 'medium-editor-x'
 import { delay } from '../../decorator'
 
-const captionClassName: string = 'medium-editor-insert-image-caption'
-const elementClassName: string = 'medium-editor-insert-images'
-const activeClassName: string = 'medium-editor-insert-image-active'
 export interface ImageOptions {
   onClick(cb: (url: string) => void)
 }
@@ -23,8 +19,9 @@ export class ImageExtension extends AbstractExtension {
   }
   _plugin: any
   _editor: any
-  elementClassName: string = elementClassName
-  activeClassName: string = activeClassName
+  captionClassName: string = 'medium-editor-insert-image-caption'
+  elementClassName: string = 'medium-editor-insert-images'
+  activeClassName: string = 'medium-editor-insert-image-active'
 
   imageID: number = 0
   cacheImages: object = {}
@@ -119,7 +116,7 @@ export class ImageExtension extends AbstractExtension {
       if (!el) {
         return false
       }
-      if (el.classList.contains(elementClassName)) {
+      if (el.classList.contains(this.elementClassName)) {
         // 删除 el 的最后一个，移到下一行，如果没有的话，给 el 的父节点添加新行
         if (el.lastChild.nodeName.toLowerCase() === 'p') {
           el.removeChild(el.lastChild)
@@ -134,8 +131,8 @@ export class ImageExtension extends AbstractExtension {
   // 处理在 caption 后面回车的情况
   private handleEnterAfterCaption (elem: any): boolean {
     // 如不是 caption 元素，则检查上层父节点（可能 caption 被添加了 style）
-    if (!elem || !elem.classList.contains(captionClassName)) {
-      const target = utils.getClosestWithClassName(elem, captionClassName)
+    if (!elem || !elem.classList.contains(this.captionClassName)) {
+      const target = utils.getClosestWithClassName(elem, this.captionClassName)
       if (!target) {
         return false
       }
@@ -151,7 +148,7 @@ export class ImageExtension extends AbstractExtension {
     if (!el) {
       return false
     }
-    if (el.classList.contains(elementClassName)) {
+    if (el.classList.contains(this.elementClassName)) {
       // 此时在 image 中新增了一行，删除此行
       if (el.lastChild.nodeName.toLowerCase() === 'p') {
         el.removeChild(el.lastChild)
@@ -227,26 +224,22 @@ export class ImageExtension extends AbstractExtension {
   public toolbar(): ToolbarOptions {
     return {
       type: 'images',
-      activeClassName: activeClassName,
+      activeClassName: this.activeClassName,
       buttons: [
         {
           name: 'align-left',
-          action: 'left',
           label: 'Left'
         },
         {
           name: 'align-center',
-          action: 'center',
           label: 'Center'
         },
         {
           name: 'align-right',
-          action: 'right',
           label: 'Right'
         },
         {
           name: 'caption',
-          action: 'add-caption',
           label: 'Add Caption'
         }
       ]
@@ -269,7 +262,7 @@ export class ImageExtension extends AbstractExtension {
     // caption
     const caption = document.createElement('figcaption')
     caption.setAttribute('data-image-id', `${imageID}`)
-    caption.innerHTML = `<span data-image-id='${imageID}' class="${captionClassName}">请输入图片描述</span>`
+    caption.innerHTML = `<span data-image-id='${imageID}' class="${this.captionClassName}">请输入图片描述</span>`
 
     // If we're dealing with a preview image,
     // we don't have to preload it before displaying
@@ -287,7 +280,7 @@ export class ImageExtension extends AbstractExtension {
       }
       domImage.src = url
     }
-    el.classList.add(elementClassName)
+    el.classList.add(this.elementClassName)
     // el.setAttribute('contenteditable', 'false')
     return el
   }

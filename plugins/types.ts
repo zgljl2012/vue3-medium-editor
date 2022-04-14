@@ -37,7 +37,6 @@ export interface ToolbarOptions {
   activeClassName: string,
   buttons: {
     name: string
-    action: string
     label: string
   }[]
 }
