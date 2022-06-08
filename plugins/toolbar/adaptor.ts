@@ -90,8 +90,6 @@ export class MediumEditorToolbar extends MediumEditor.extensions.toolbar {
         btn: buttonOptions,
         activeClassName: this.activeClassName
       })
-
-      // button.getButton().init()
       options.editor.base.extensions.push(button.getButton())
     })
 

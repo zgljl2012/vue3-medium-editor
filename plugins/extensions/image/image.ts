@@ -14,6 +14,7 @@ export class ImageExtension extends AbstractExtension {
   // options: ImageOptions
   name: string = 'image'
   label: string = '<span class="fa fa-camera"></span>'
+  captionDefaultText: string = '请输入图片描述'
 
   options: ImageOptions = {
     // 如果 click 不为空且为一个函数，则点击时将调用 click(cb)，cb 为一个回调函数，需传入图片地址
@@ -151,6 +152,16 @@ export class ImageExtension extends AbstractExtension {
     if (!el) {
       return false
     }
+    // 如果 caption 元素内容为默认内容，说明用户没有输入，则删除 caption 元素
+    if (el.childNodes[1]) {
+      const fig = el.childNodes[1]
+      if (fig.childNodes[0]) {
+        const text = fig.childNodes[0].textContent
+        if (text === this.captionDefaultText) {
+          el.removeChild(fig) // 用户没有输入，直接删除默认的 figcaption
+        }
+      }
+    }
     if (el.classList.contains(this.elementClassName)) {
       // 此时在 image 中新增了一行，删除此行
       if (el.lastChild.nodeName.toLowerCase() === 'p') {
@@ -257,7 +268,7 @@ export class ImageExtension extends AbstractExtension {
     // caption
     const caption = document.createElement('figcaption')
     caption.setAttribute('data-image-id', `${imageID}`)
-    caption.innerHTML = `<span data-image-id='${imageID}' class="${this.captionClassName}">请输入图片描述</span>`
+    caption.innerHTML = `<span data-image-id='${imageID}' class="${this.captionClassName}">${this.captionDefaultText}</span>`
 
     // If we're dealing with a preview image,
     // we don't have to preload it before displaying

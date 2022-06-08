@@ -3,7 +3,6 @@
     <editor :text="text" @edit='edit' :onClickImage="onClickImage" />
   </div>
 </template>
-
 <script lang="js">
 import { defineComponent } from 'vue'
 import editor from 'vue3-medium-editor'
