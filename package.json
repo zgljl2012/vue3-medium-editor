@@ -1,6 +1,6 @@
 {
   "name": "vue3-medium-editor",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "A medium editor for vue 3.x",
   "source": "dist/index.js",
   "main": "dist/index.js",
